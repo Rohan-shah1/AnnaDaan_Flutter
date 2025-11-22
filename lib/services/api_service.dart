@@ -160,9 +160,54 @@ class ApiService with ChangeNotifier {
     }
   }
 
-  // Update Profile (for completing donor/receiver registration)
+  // ⭐ FIXED: Update Profile for EDITING (uses PATCH, no userType required)
   Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> profileData) async {
     try {
+      // Use PATCH method for editing existing profiles
+      final response = await http.patch(
+        Uri.parse('$baseUrl/api/auth/profile'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+        body: json.encode(profileData),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        // Update local user profile
+        _userProfile = data['user'];
+        
+        // Save to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_profile', json.encode(_userProfile));
+        
+        notifyListeners();
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Profile updated successfully',
+          'user': data['user']
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Profile update failed'
+        };
+      }
+    } catch (e) {
+      print('❌ Error updating profile: $e');
+      return {
+        'success': false,
+        'message': 'Network error: $e'
+      };
+    }
+  }
+
+  // Complete Profile (for initial profile setup with userType - uses PUT)
+  Future<Map<String, dynamic>> completeProfile(Map<String, dynamic> profileData) async {
+    try {
+      // Use PUT method for completing profile (includes userType)
       final response = await http.put(
         Uri.parse('$baseUrl/api/auth/profile'),
         headers: {
@@ -176,13 +221,28 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200) {
         _userProfile = data['user'];
+        
+        // Save to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_profile', json.encode(_userProfile));
+        
         notifyListeners();
-        return {'success': true, 'message': 'Profile updated successfully', 'user': data['user']};
+        return {
+          'success': true,
+          'message': 'Profile completed successfully',
+          'user': data['user']
+        };
       } else {
-        return {'success': false, 'message': data['message'] ?? 'Profile update failed'};
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Profile completion failed'
+        };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return {
+        'success': false,
+        'message': 'Network error: $e'
+      };
     }
   }
 
@@ -190,6 +250,7 @@ class ApiService with ChangeNotifier {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
+    await prefs.remove('user_profile');
 
     _token = null;
     _userProfile = null;

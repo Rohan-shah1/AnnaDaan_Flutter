@@ -110,11 +110,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           CircleAvatar(
             radius: 40,
             backgroundColor: Color(0xFF2E7D32),
-            child: Icon(
-              userType == 'donor' ? Icons.restaurant : Icons.business,
-              size: 40,
-              color: Colors.white,
-            ),
+            backgroundImage: _userProfile?['profilePicture'] != null
+                ? NetworkImage('${ApiService.baseUrl}/api/upload/${_userProfile!['profilePicture']}')
+                : null,
+            child: _userProfile?['profilePicture'] == null
+                ? Icon(
+                    userType == 'donor' ? Icons.restaurant : Icons.business,
+                    size: 40,
+                    color: Colors.white,
+                  )
+                : null,
           ),
           SizedBox(height: 16),
 

@@ -289,8 +289,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             CircleAvatar(
               radius: 50,
               backgroundColor: Color(0xFF2E7D32),
-              backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
-              child: _imageFile == null
+              backgroundImage: _imageFile != null
+                  ? FileImage(_imageFile!)
+                  : (profile?['profilePicture'] != null
+                      ? NetworkImage('${ApiService.baseUrl}/api/upload/${profile!['profilePicture']}')
+                      : null) as ImageProvider?,
+              child: _imageFile == null && profile?['profilePicture'] == null
                   ? Icon(
                       profile?['role'] == 'donor' ? Icons.restaurant : Icons.business,
                       size: 50,

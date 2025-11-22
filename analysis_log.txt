@@ -1,0 +1,362 @@
+Analyzing AnnaDaan...                                           
+
+   info - The imported package 'google_fonts' isn't a dependency of the importing package - lib\main.dart:4:8 - depend_on_referenced_packages
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\main.dart:5:8 - depend_on_referenced_packages
+  error - The name 'DonorDashboard' isn't a class - lib\main.dart:75:48 - creation_with_non_type
+   info - The imported package 'http' isn't a dependency of the importing package - lib\services\api_service.dart:4:8 - depend_on_referenced_packages
+   info - The imported package 'http_parser' isn't a dependency of the importing package - lib\services\api_service.dart:5:8 - depend_on_referenced_packages
+   info - The imported package 'shared_preferences' isn't a dependency of the importing package - lib\services\api_service.dart:6:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:47:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:49:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:64:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:67:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:70:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:161:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:181:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:195:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:357:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:361:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:386:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:390:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:436:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:440:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:462:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:466:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\api_service.dart:484:7 - avoid_print
+   info - The imported package 'google_sign_in' isn't a dependency of the importing package - lib\services\google_signin_service.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:12:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:17:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:21:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:26:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:37:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:45:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\google_signin_service.dart:47:7 - avoid_print
+   info - Invalid use of a private type in a public API - lib\views\pages\about_screen.dart:7:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\about_screen.dart:11:7 - prefer_final_fields
+   info - Invalid use of a private type in a public API - lib\views\pages\active_donations_screen.dart:7:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\active_donations_screen.dart:11:7 - prefer_final_fields
+   info - Invalid use of a private type in a public API - lib\views\pages\donation_history_screen.dart:7:3 - library_private_types_in_public_api
+   info - Unnecessary use of 'toList' in a spread - lib\views\pages\donation_history_screen.dart:245:12 - unnecessary_to_list_in_spreads
+   info - Invalid use of a private type in a public API - lib\views\pages\donor_dashboard.dart:1:3 - library_private_types_in_public_api
+  error - Expected a method, getter, setter or operator declaration - lib\views\pages\donor_dashboard.dart:2:1 - expected_executable
+  error - Classes can only extend other classes - lib\views\pages\donor_dashboard.dart:4:36 - extends_non_class
+  error - The name 'DonorDashboard' isn't a type, so it can't be used as a type argument - lib\views\pages\donor_dashboard.dart:4:42 - non_type_as_type_argument
+warning - The method doesn't override an inherited method - lib\views\pages\donor_dashboard.dart:10:8 - override_on_non_overriding_member
+  error - The method 'initState' isn't defined in a superclass of '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:11:11 - undefined_super_member
+  error - Undefined name 'Provider' - lib\views\pages\donor_dashboard.dart:17:26 - undefined_identifier
+  error - The name 'ApiService' isn't a type, so it can't be used as a type argument - lib\views\pages\donor_dashboard.dart:17:38 - non_type_as_type_argument
+  error - Undefined name 'context' - lib\views\pages\donor_dashboard.dart:17:50 - undefined_identifier
+  error - The method 'setState' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:19:7 - undefined_method
+   info - Don't invoke 'print' in production code - lib\views\pages\donor_dashboard.dart:24:7 - avoid_print
+  error - The method 'setState' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:25:7 - undefined_method
+  error - Undefined class 'Widget' - lib\views\pages\donor_dashboard.dart:32:3 - undefined_class
+warning - The method doesn't override an inherited method - lib\views\pages\donor_dashboard.dart:32:10 - override_on_non_overriding_member
+  error - Undefined class 'BuildContext' - lib\views\pages\donor_dashboard.dart:32:16 - undefined_class
+  error - The method 'Scaffold' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:33:12 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:34:24 - undefined_identifier
+  error - The method 'SingleChildScrollView' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:35:13 - undefined_method
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:36:16 - undefined_method
+  error - Undefined name 'CrossAxisAlignment' - lib\views\pages\donor_dashboard.dart:37:31 - undefined_identifier
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:40:13 - undefined_method
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:42:24 - undefined_identifier
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:43:27 - undefined_method
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:44:24 - undefined_method
+  error - Undefined name 'BorderRadius' - lib\views\pages\donor_dashboard.dart:45:31 - undefined_identifier
+  error - Undefined name 'Radius' - lib\views\pages\donor_dashboard.dart:46:31 - undefined_identifier
+  error - Undefined name 'Radius' - lib\views\pages\donor_dashboard.dart:47:32 - undefined_identifier
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:50:22 - undefined_method
+  error - Undefined name 'CrossAxisAlignment' - lib\views\pages\donor_dashboard.dart:51:37 - undefined_identifier
+  error - The method 'Row' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:53:19 - undefined_method
+  error - Undefined name 'MainAxisAlignment' - lib\views\pages\donor_dashboard.dart:54:40 - undefined_identifier
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:56:23 - undefined_method
+  error - Undefined name 'CrossAxisAlignment' - lib\views\pages\donor_dashboard.dart:57:45 - undefined_identifier
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:59:27 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:61:36 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:62:38 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:67:27 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:68:27 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:70:36 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:71:38 - undefined_identifier
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:73:43 - undefined_identifier
+  error - The method 'CircleAvatar' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:79:23 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:81:42 - undefined_identifier
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:82:32 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:82:37 - undefined_identifier
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:82:58 - undefined_method
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:86:19 - undefined_method
+  error - The method 'Row' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:88:19 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:90:53 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:91:23 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:92:56 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:93:23 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:94:55 - undefined_identifier
+  error - The method 'Padding' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:101:13 - undefined_method
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:102:24 - undefined_identifier
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:103:22 - undefined_method
+  error - Undefined name 'CrossAxisAlignment' - lib\views\pages\donor_dashboard.dart:104:37 - undefined_identifier
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:106:19 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:108:28 - undefined_method
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:110:35 - undefined_identifier
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:111:30 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:115:19 - undefined_method
+  error - The method 'Row' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:116:19 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:120:25 - undefined_identifier
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:121:25 - undefined_method
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:122:25 - undefined_method
+  error - Undefined name 'Navigator' - lib\views\pages\donor_dashboard.dart:124:27 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:126:29 - undefined_method
+  error - The method 'PostDonationScreen' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:126:69 - undefined_method
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:130:23 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:133:25 - undefined_identifier
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:134:25 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:135:25 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:140:19 - undefined_method
+  error - The method 'Row' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:141:19 - undefined_method
+  error - Undefined name 'MainAxisAlignment' - lib\views\pages\donor_dashboard.dart:142:40 - undefined_identifier
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:144:23 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:146:32 - undefined_method
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:148:39 - undefined_identifier
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:149:34 - undefined_identifier
+  error - The method 'TextButton' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:153:23 - undefined_method
+  error - Undefined name 'Navigator' - lib\views\pages\donor_dashboard.dart:155:27 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:157:29 - undefined_method
+  error - The method 'ActiveDonationsScreen' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:157:69 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:160:32 - undefined_method
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:164:19 - undefined_method
+  error - The method 'Center' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:166:25 - undefined_method
+  error - The method 'CircularProgressIndicator' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:166:39 - undefined_method
+  error - The method 'Center' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:168:29 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:168:43 - undefined_method
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:169:29 - undefined_method
+  error - Undefined class 'Widget' - lib\views\pages\donor_dashboard.dart:184:3 - undefined_class
+  error - Undefined class 'IconData' - lib\views\pages\donor_dashboard.dart:184:53 - undefined_class
+  error - The method 'Expanded' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:185:12 - undefined_method
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:186:14 - undefined_method
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:187:18 - undefined_identifier
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:188:21 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:189:18 - undefined_identifier
+  error - Undefined name 'BorderRadius' - lib\views\pages\donor_dashboard.dart:190:25 - undefined_identifier
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:192:16 - undefined_method
+  error - Undefined name 'CrossAxisAlignment' - lib\views\pages\donor_dashboard.dart:193:31 - undefined_identifier
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:195:13 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:195:31 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:196:13 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:197:13 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:199:22 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:200:24 - undefined_identifier
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:202:29 - undefined_identifier
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:206:13 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:208:22 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:209:24 - undefined_identifier
+  error - Undefined class 'Widget' - lib\views\pages\donor_dashboard.dart:220:3 - undefined_class
+  error - Undefined class 'IconData' - lib\views\pages\donor_dashboard.dart:221:21 - undefined_class
+  error - Undefined class 'Color' - lib\views\pages\donor_dashboard.dart:221:36 - undefined_class
+  error - Undefined class 'Color' - lib\views\pages\donor_dashboard.dart:221:51 - undefined_class
+  error - Undefined class 'VoidCallback' - lib\views\pages\donor_dashboard.dart:221:68 - undefined_class
+  error - The method 'Expanded' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:222:12 - undefined_method
+  error - The method 'GestureDetector' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:223:14 - undefined_method
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:225:16 - undefined_method
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:226:20 - undefined_identifier
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:227:23 - undefined_method
+  error - Undefined name 'BorderRadius' - lib\views\pages\donor_dashboard.dart:229:27 - undefined_identifier
+  error - The method 'BoxShadow' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:231:15 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:232:24 - undefined_identifier
+  error - The method 'Offset' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:235:25 - undefined_method
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:239:18 - undefined_method
+  error - Undefined name 'MainAxisAlignment' - lib\views\pages\donor_dashboard.dart:240:32 - undefined_identifier
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:242:15 - undefined_method
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:243:15 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:244:15 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:246:24 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:247:26 - undefined_identifier
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:248:31 - undefined_identifier
+  error - Undefined class 'Widget' - lib\views\pages\donor_dashboard.dart:259:3 - undefined_class
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:260:12 - undefined_method
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:261:15 - undefined_identifier
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:262:16 - undefined_identifier
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:263:19 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:264:16 - undefined_identifier
+  error - Undefined name 'BorderRadius' - lib\views\pages\donor_dashboard.dart:265:23 - undefined_identifier
+  error - The method 'BoxShadow' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:267:11 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:268:20 - undefined_identifier
+  error - The method 'Offset' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:271:21 - undefined_method
+  error - The method 'Row' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:275:14 - undefined_method
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:277:11 - undefined_method
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:280:25 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:281:22 - undefined_identifier
+  error - Undefined name 'BorderRadius' - lib\views\pages\donor_dashboard.dart:282:29 - undefined_identifier
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:284:20 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:284:25 - undefined_identifier
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:284:48 - undefined_method
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:286:11 - undefined_method
+  error - The method 'Expanded' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:287:11 - undefined_method
+  error - The method 'Column' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:288:20 - undefined_method
+  error - Undefined name 'CrossAxisAlignment' - lib\views\pages\donor_dashboard.dart:289:35 - undefined_identifier
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:291:17 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:293:26 - undefined_method
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:295:33 - undefined_identifier
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:296:28 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:300:17 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:301:17 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:303:26 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:305:28 - undefined_identifier
+  error - The method 'SizedBox' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:309:17 - undefined_method
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:310:17 - undefined_method
+  error - Undefined name 'EdgeInsets' - lib\views\pages\donor_dashboard.dart:311:28 - undefined_identifier
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:312:31 - undefined_method
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:313:28 - undefined_method
+  error - Undefined name 'BorderRadius' - lib\views\pages\donor_dashboard.dart:314:35 - undefined_identifier
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:316:26 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:318:28 - undefined_method
+  error - Undefined name 'FontWeight' - lib\views\pages\donor_dashboard.dart:320:35 - undefined_identifier
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:321:30 - undefined_method
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:329:11 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:329:16 - undefined_identifier
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:329:58 - undefined_identifier
+  error - Undefined class 'Widget' - lib\views\pages\donor_dashboard.dart:335:3 - undefined_class
+  error - The method 'Container' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:336:12 - undefined_method
+  error - The method 'BoxDecoration' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:337:19 - undefined_method
+  error - The method 'BoxShadow' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:339:11 - undefined_method
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:340:20 - undefined_method
+  error - The method 'Offset' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:343:21 - undefined_method
+  error - The method 'BottomNavigationBar' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:347:14 - undefined_method
+  error - The method 'setState' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:350:11 - undefined_method
+  error - Undefined name 'BottomNavigationBarType' - lib\views\pages\donor_dashboard.dart:355:15 - undefined_identifier
+  error - The method 'Color' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:356:28 - undefined_method
+  error - Undefined name 'Colors' - lib\views\pages\donor_dashboard.dart:357:30 - undefined_identifier
+  error - The method 'BottomNavigationBarItem' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:361:11 - undefined_method
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:362:19 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:362:24 - undefined_identifier
+  error - The method 'BottomNavigationBarItem' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:365:11 - undefined_method
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:366:19 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:366:24 - undefined_identifier
+  error - The method 'BottomNavigationBarItem' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:369:11 - undefined_method
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:370:19 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:370:24 - undefined_identifier
+  error - The method 'BottomNavigationBarItem' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:373:11 - undefined_method
+  error - The method 'Icon' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:374:19 - undefined_method
+  error - Undefined name 'Icons' - lib\views\pages\donor_dashboard.dart:374:24 - undefined_identifier
+  error - Undefined name 'Navigator' - lib\views\pages\donor_dashboard.dart:388:9 - undefined_identifier
+  error - Undefined name 'context' - lib\views\pages\donor_dashboard.dart:389:11 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:390:11 - undefined_method
+  error - The method 'ActiveDonationsScreen' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:390:51 - undefined_method
+  error - Undefined name 'Navigator' - lib\views\pages\donor_dashboard.dart:394:9 - undefined_identifier
+  error - Undefined name 'context' - lib\views\pages\donor_dashboard.dart:395:11 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:396:11 - undefined_method
+  error - The method 'ImpactScreen' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:396:51 - undefined_method
+  error - Undefined name 'Navigator' - lib\views\pages\donor_dashboard.dart:400:9 - undefined_identifier
+  error - Undefined name 'context' - lib\views\pages\donor_dashboard.dart:401:11 - undefined_identifier
+  error - The method 'MaterialPageRoute' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:402:11 - undefined_method
+  error - The method 'ProfileScreen' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:402:51 - undefined_method
+  error - Undefined name 'ScaffoldMessenger' - lib\views\pages\donor_dashboard.dart:409:5 - undefined_identifier
+  error - Undefined name 'context' - lib\views\pages\donor_dashboard.dart:409:26 - undefined_identifier
+  error - The method 'SnackBar' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:410:7 - undefined_method
+  error - The method 'Text' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:411:18 - undefined_method
+  error - The method 'TextStyle' isn't defined for the type '_DonorDashboardState' - lib\views\pages\donor_dashboard.dart:413:18 - undefined_method
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\views\pages\donor_form.dart:2:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\donor_form.dart:9:3 - library_private_types_in_public_api
+  error - The method 'updateProfile' isn't defined for the type 'ApiService' - lib\views\pages\donor_form.dart:54:40 - undefined_method
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\donor_form.dart:67:40 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\donor_form.dart:69:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\donor_form.dart:74:28 - use_build_context_synchronously
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\views\pages\donor_form.dart:298:19 - sized_box_for_whitespace
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\views\pages\donor_form.dart:317:17 - sized_box_for_whitespace
+   info - Invalid use of a private type in a public API - lib\views\pages\edit_profile_screen.dart:7:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\edit_profile_screen.dart:11:7 - prefer_final_fields
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\edit_profile_screen.dart:61:20 - use_build_context_synchronously
+   info - Invalid use of a private type in a public API - lib\views\pages\help_support_screen.dart:7:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\help_support_screen.dart:11:7 - prefer_final_fields
+   info - Unnecessary use of 'toList' in a spread - lib\views\pages\help_support_screen.dart:80:51 - unnecessary_to_list_in_spreads
+   info - The 'children' argument should be last in widget constructor invocations - lib\views\pages\help_support_screen.dart:99:9 - sort_child_properties_last
+warning - Unused import: 'donor_dashboard.dart' - lib\views\pages\impact_screen.dart:2:8 - unused_import
+   info - Invalid use of a private type in a public API - lib\views\pages\impact_screen.dart:10:3 - library_private_types_in_public_api
+  error - The method 'DonorDashboard' isn't defined for the type '_ImpactScreenState' - lib\views\pages\impact_screen.dart:37:55 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\impact_screen.dart:119:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\impact_screen.dart:140:33 - deprecated_member_use
+  error - The method 'DonorDashboard' isn't defined for the type '_ImpactScreenState' - lib\views\pages\impact_screen.dart:304:51 - undefined_method
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\views\pages\login_screen.dart:2:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\login_screen.dart:11:3 - library_private_types_in_public_api
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\login_screen.dart:321:52 - use_build_context_synchronously
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\views\pages\notifications_screen.dart:2:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\notifications_screen.dart:9:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\notifications_screen.dart:15:7 - prefer_final_fields
+   info - Don't invoke 'print' in production code - lib\views\pages\notifications_screen.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\views\pages\notifications_screen.dart:52:7 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\notifications_screen.dart:202:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\notifications_screen.dart:215:74 - deprecated_member_use
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\views\pages\post_donation_screen.dart:2:8 - depend_on_referenced_packages
+warning - Unused import: 'package:provider/provider.dart' - lib\views\pages\post_donation_screen.dart:2:8 - unused_import
+warning - Unused import: '../../services/api_service.dart' - lib\views\pages\post_donation_screen.dart:3:8 - unused_import
+   info - Invalid use of a private type in a public API - lib\views\pages\post_donation_screen.dart:9:3 - library_private_types_in_public_api
+   info - The private field _foodDescriptionController could be 'final' - lib\views\pages\post_donation_screen.dart:16:25 - prefer_final_fields
+   info - The private field _quantityController could be 'final' - lib\views\pages\post_donation_screen.dart:17:25 - prefer_final_fields
+   info - The private field _readyByController could be 'final' - lib\views\pages\post_donation_screen.dart:18:25 - prefer_final_fields
+   info - The private field _pickupWindowEndController could be 'final' - lib\views\pages\post_donation_screen.dart:19:25 - prefer_final_fields
+   info - The private field _additionalNotesController could be 'final' - lib\views\pages\post_donation_screen.dart:20:25 - prefer_final_fields
+   info - The private field _foodSafetyChecklist could be 'final' - lib\views\pages\post_donation_screen.dart:25:21 - prefer_final_fields
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\views\pages\post_donation_screen.dart:125:11 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\views\pages\post_donation_screen.dart:126:11 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\views\pages\post_donation_screen.dart:275:11 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\views\pages\post_donation_screen.dart:276:11 - deprecated_member_use
+warning - The value of the local variable '<unnamed>' isn't used - lib\views\pages\post_donation_screen.dart:345:16 - unused_local_variable
+warning - The value of the local variable 'donationData' isn't used - lib\views\pages\post_donation_screen.dart:348:28 - unused_local_variable
+  error - Unexpected text 'return' - lib\views\pages\post_donation_screen.dart:355:9 - unexpected_token
+  error - Expressions can't be used in a map literal - lib\views\pages\post_donation_screen.dart:355:16 - expression_in_map
+  error - Expected to find '}' - lib\views\pages\post_donation_screen.dart:376:10 - expected_token
+  error - Expected an identifier - lib\views\pages\post_donation_screen.dart:378:5 - missing_identifier
+  error - Expected to find '}' - lib\views\pages\post_donation_screen.dart:379:3 - expected_token
+warning - The declaration '_showErrorDialog' isn't referenced - lib\views\pages\post_donation_screen.dart:381:8 - unused_element
+warning - The declaration '_clearForm' isn't referenced - lib\views\pages\post_donation_screen.dart:410:8 - unused_element
+   info - Invalid use of a private type in a public API - lib\views\pages\preferred_ngos_screen.dart:7:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\preferred_ngos_screen.dart:11:7 - prefer_final_fields
+warning - Unused import: 'donor_dashboard.dart' - lib\views\pages\profile_screen.dart:6:8 - unused_import
+   info - Invalid use of a private type in a public API - lib\views\pages\profile_screen.dart:14:3 - library_private_types_in_public_api
+  error - The method 'DonorDashboard' isn't defined for the type '_ProfileScreenState' - lib\views\pages\profile_screen.dart:41:55 - undefined_method
+  error - The method 'DonorDashboard' isn't defined for the type '_ProfileScreenState' - lib\views\pages\profile_screen.dart:312:51 - undefined_method
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\views\pages\receiver_browse_screen.dart:3:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\receiver_browse_screen.dart:10:3 - library_private_types_in_public_api
+   info - Don't invoke 'print' in production code - lib\views\pages\receiver_browse_screen.dart:43:7 - avoid_print
+   info - Unnecessary use of 'toList' in a spread - lib\views\pages\receiver_browse_screen.dart:193:22 - unnecessary_to_list_in_spreads
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_browse_screen.dart:208:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_browse_screen.dart:247:32 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\receiver_browse_screen.dart:468:40 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\receiver_browse_screen.dart:481:40 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\receiver_browse_screen.dart:493:38 - use_build_context_synchronously
+   info - Invalid use of a private type in a public API - lib\views\pages\receiver_dashboard.dart:7:3 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_dashboard.dart:34:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_dashboard.dart:252:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_dashboard.dart:299:32 - deprecated_member_use
+   info - Unnecessary use of 'toList' in a spread - lib\views\pages\receiver_dashboard.dart:614:16 - unnecessary_to_list_in_spreads
+   info - Unnecessary use of 'toList' in a spread - lib\views\pages\receiver_dashboard.dart:630:18 - unnecessary_to_list_in_spreads
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_dashboard.dart:647:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_dashboard.dart:1036:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\receiver_dashboard.dart:1047:28 - deprecated_member_use
+   info - The imported package 'provider' isn't a dependency of the importing package - lib\views\pages\receiver_form.dart:2:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\receiver_form.dart:9:3 - library_private_types_in_public_api
+  error - The method 'updateProfile' isn't defined for the type 'ApiService' - lib\views\pages\receiver_form.dart:54:40 - undefined_method
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\receiver_form.dart:67:40 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\receiver_form.dart:69:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\receiver_form.dart:74:28 - use_build_context_synchronously
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\views\pages\receiver_form.dart:298:19 - sized_box_for_whitespace
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\views\pages\receiver_form.dart:317:17 - sized_box_for_whitespace
+   info - Don't invoke 'print' in production code - lib\views\pages\role_selection_screen.dart:55:19 - avoid_print
+   info - Don't invoke 'print' in production code - lib\views\pages\role_selection_screen.dart:67:19 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\role_selection_screen.dart:90:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\role_selection_screen.dart:101:30 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\views\pages\settings_screen.dart:7:3 - library_private_types_in_public_api
+   info - The private field _currentIndex could be 'final' - lib\views\pages\settings_screen.dart:11:7 - prefer_final_fields
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\views\pages\settings_screen.dart:194:11 - deprecated_member_use
+   info - The imported package 'google_sign_in' isn't a dependency of the importing package - lib\views\pages\signup_page.dart:3:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\signup_page.dart:8:3 - library_private_types_in_public_api
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\signup_page.dart:39:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\signup_page.dart:47:38 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\signup_page.dart:50:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\signup_page.dart:90:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\signup_page.dart:98:38 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\views\pages\signup_page.dart:104:28 - use_build_context_synchronously
+   info - The imported package 'google_fonts' isn't a dependency of the importing package - lib\views\pages\splash_screen.dart:2:8 - depend_on_referenced_packages
+   info - Invalid use of a private type in a public API - lib\views\pages\splash_screen.dart:9:3 - library_private_types_in_public_api
+   info - Don't invoke 'print' in production code - lib\views\pages\splash_screen.dart:27:11 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\views\pages\splash_screen.dart:75:44 - deprecated_member_use
+warning - Unused import: 'package:annadaan/main.dart' - test\widget_test.dart:11:8 - unused_import
+

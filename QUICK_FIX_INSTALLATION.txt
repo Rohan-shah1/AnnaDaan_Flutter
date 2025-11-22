@@ -1,0 +1,40 @@
+QUICK FIX FOR INSTALLATION ISSUE
+================================
+
+Your device is detected but installation fails. Here's the solution:
+
+STEP 1: UNINSTALL OLD VERSION (MOST IMPORTANT!)
+------------------------------------------------
+On your phone:
+1. Go to Settings → Apps
+2. Search for "annadaan"
+3. If you find it, tap it and UNINSTALL
+4. This is usually why installation fails!
+
+STEP 2: ENABLE USB INSTALLATION
+--------------------------------
+On your phone:
+1. Settings → Developer Options
+2. Enable "Install via USB" (if available)
+3. Enable "USB Debugging (Security settings)"
+
+STEP 3: TRY INSTALLATION AGAIN
+-------------------------------
+Run: flutter run
+
+OR manually install:
+1. Copy this file to your phone:
+   build\app\outputs\flutter-apk\app-debug.apk
+2. On phone: Open the APK file
+3. Tap "Install"
+
+STEP 4: IF STILL FAILS
+----------------------
+Check your phone screen - there might be a popup asking for permission.
+Look for any error messages on the phone screen.
+
+The APK file is ready at:
+build\app\outputs\flutter-apk\app-debug.apk
+
+Transfer it to your phone and install manually if Flutter install fails.
+

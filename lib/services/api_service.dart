@@ -323,7 +323,7 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         notifyListeners();
-        return {'success': true, 'message': 'Donation posted successfully', 'data': data};
+        return {'success': true, 'message': 'Donation posted successfully', 'data': data['donation']};
       } else {
         return {'success': false, 'message': data['message'] ?? 'Failed to post donation'};
       }
@@ -356,7 +356,7 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['data'] ?? [];
+        return data['donations'] ?? [];
       } else {
         print('Failed to fetch my donations: ${response.body}');
         return [];
@@ -391,7 +391,7 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['data'] ?? [];
+        return data['donations'] ?? [];
       } else {
         print('Failed to fetch nearby donations: ${response.body}');
         return [];
@@ -415,7 +415,7 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['data'];
+        return data['donation'];
       } else {
         print('Failed to fetch donation: ${response.body}');
         return null;
@@ -492,7 +492,7 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         notifyListeners();
-        return {'success': true, 'message': 'Reservation successful', 'data': data};
+        return {'success': true, 'message': 'Reservation successful', 'data': data['reservation']};
       } else {
         return {'success': false, 'message': data['message'] ?? 'Reservation failed'};
       }
@@ -519,7 +519,7 @@ class ApiService with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['data'] ?? [];
+        return data['reservations'] ?? [];
       } else {
         print('Failed to fetch my reservations: ${response.body}');
         return [];

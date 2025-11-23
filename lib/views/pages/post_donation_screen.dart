@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
+import 'location_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PostDonationScreen extends StatefulWidget {
   const PostDonationScreen({super.key});
@@ -96,7 +98,7 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
         Row(
           children: [
             Expanded(
-              flex: 2,
+              flex: 3,
               child: TextFormField(
                 controller: _quantityValueController,
                 keyboardType: TextInputType.number,
@@ -110,14 +112,17 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
             ),
             const SizedBox(width: 10),
             Expanded(
+              flex: 2,
               child: DropdownButtonFormField<String>(
                 value: _selectedQuantityUnit,
                 decoration: const InputDecoration(
                   labelText: 'UNIT',
                   border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                 ),
+                isExpanded: true,
                 items: ['kg', 'portions', 'boxes', 'crates'].map((unit) {
-                  return DropdownMenuItem(value: unit, child: Text(unit));
+                  return DropdownMenuItem(value: unit, child: Text(unit, overflow: TextOverflow.ellipsis));
                 }).toList(),
                 onChanged: (value) => setState(() => _selectedQuantityUnit = value!),
               ),
@@ -221,7 +226,42 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
           validator: (v) => (v == null || v.isEmpty) ? 'Enter address' : null,
           maxLines: 2,
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LocationPicker()),
+              );
+              
+              if (result != null && result is Map) {
+                setState(() {
+                  if (result['address'] != null) {
+                    _addressController.text = result['address'];
+                    // Extract city if possible, or just leave it for user to edit
+                    // Simple heuristic: split by comma and take the 3rd last or so?
+                    // For now, let's just populate address.
+                    // If the address format is "Street, SubLocality, Locality, Postal, Country"
+                    // Locality is likely the city.
+                    final parts = result['address'].toString().split(', ');
+                    if (parts.length >= 3) {
+                      _cityController.text = parts[2];
+                    }
+                  }
+                  if (result['location'] != null && result['location'] is LatLng) {
+                    _latController.text = (result['location'] as LatLng).latitude.toString();
+                    _lngController.text = (result['location'] as LatLng).longitude.toString();
+                  }
+                });
+              }
+            },
+            icon: const Icon(Icons.map, color: Color(0xFF2E7D32)),
+            label: const Text('Pick on Map', style: TextStyle(color: Color(0xFF2E7D32), fontFamily: 'Poppins')),
+          ),
+        ),
+        const SizedBox(height: 5),
         TextFormField(
           controller: _cityController,
           decoration: const InputDecoration(

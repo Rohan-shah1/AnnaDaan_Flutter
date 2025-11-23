@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
+import 'location_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DonorForm extends StatefulWidget {
   const DonorForm({super.key});
@@ -240,6 +242,23 @@ class _DonorFormState extends State<DonorForm> {
                   hintText: 'Mumbai',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.map),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LocationPicker()),
+                      );
+                      
+                      if (result != null && result is Map) {
+                        setState(() {
+                          if (result['address'] != null) {
+                            _cityController.text = result['address'];
+                          }
+                        });
+                      }
+                    },
+                  ),
                 ),
               ),
               SizedBox(height: 50),

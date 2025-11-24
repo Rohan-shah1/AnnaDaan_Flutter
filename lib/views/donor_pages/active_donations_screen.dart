@@ -299,16 +299,25 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: _getFoodTypeColor(foodType).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
+                    image: donation['foodImage'] != null
+                        ? DecorationImage(
+                            image: NetworkImage('${ApiService.baseUrl}/api/upload/${donation['foodImage']}'),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
-                  child: Icon(
-                    _getFoodTypeIcon(foodType),
-                    color: _getFoodTypeColor(foodType),
-                    size: 24,
-                  ),
+                  child: donation['foodImage'] == null
+                      ? Icon(
+                          _getFoodTypeIcon(foodType),
+                          color: _getFoodTypeColor(foodType),
+                          size: 24,
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

@@ -105,20 +105,43 @@ class _DonorDashboardState extends State<DonorDashboard> {
                           ),
                         ],
                       ),
-                      Consumer<ApiService>(
-                        builder: (context, apiService, child) {
-                          final profilePic = apiService.userProfile?['profilePicture'];
-                          return CircleAvatar(
-                            radius: 24,
-                            backgroundColor: Colors.white,
-                            backgroundImage: profilePic != null
-                                ? NetworkImage('${ApiService.baseUrl}/api/upload/$profilePic')
-                                : null,
-                            child: profilePic == null
-                                ? const Icon(Icons.person, color: Color(0xFF2E7D32))
-                                : null,
-                          );
-                        },
+                      Row(
+                        children: [
+                          // Notification Bell
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.notifications_outlined,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/notifications');
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Profile Picture
+                          Consumer<ApiService>(
+                            builder: (context, apiService, child) {
+                              final profilePic = apiService.userProfile?['profilePicture'];
+                              return CircleAvatar(
+                                radius: 24,
+                                backgroundColor: Colors.white,
+                                backgroundImage: profilePic != null
+                                    ? NetworkImage('${ApiService.baseUrl}/api/upload/$profilePic')
+                                    : null,
+                                child: profilePic == null
+                                    ? const Icon(Icons.person, color: Color(0xFF2E7D32))
+                                    : null,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -320,8 +343,9 @@ class _DonorDashboardState extends State<DonorDashboard> {
     final foodDescription = donation['foodDescription'] ?? 'Food Donation';
     final status = donation['status'] ?? 'pending';
     final quantity = donation['quantity'];
-    String quantityText = '';
+    final foodImageId = donation['foodImage'];
     
+    String quantityText = '';
     if (quantity != null) {
       if (quantity is Map) {
         quantityText = '${quantity['value']} ${quantity['unit'] ?? 'units'}';
@@ -353,8 +377,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
             decoration: BoxDecoration(
               color: Colors.green.shade50,
               borderRadius: BorderRadius.circular(12),
+              image: foodImageId != null
+                  ? DecorationImage(
+                      image: NetworkImage('${ApiService.baseUrl}/api/upload/$foodImageId'),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
-            child: const Icon(Icons.fastfood, color: Color(0xFF2E7D32), size: 30),
+            child: foodImageId == null
+                ? const Icon(Icons.fastfood, color: Color(0xFF2E7D32), size: 30)
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(

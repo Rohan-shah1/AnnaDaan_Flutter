@@ -16,27 +16,39 @@ class DonorDashboard extends StatefulWidget {
 class _DonorDashboardState extends State<DonorDashboard> {
   int _currentIndex = 0;
   List<dynamic> _recentDonations = [];
+  Map<String, dynamic> _stats = {};
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchDonations();
+    _fetchDashboardData();
   }
 
-  Future<void> _fetchDonations() async {
+  Future<void> _fetchDashboardData() async {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
-      final donations = await apiService.getMyDonations();
-      setState(() {
-        _recentDonations = donations.take(5).toList(); // Show only 5 recent
-        _isLoading = false;
-      });
+      
+      // Fetch donations and stats in parallel
+      final results = await Future.wait([
+        apiService.getMyDonations(),
+        apiService.getDashboardStats(),
+      ]);
+
+      if (mounted) {
+        setState(() {
+          _recentDonations = (results[0] as List).take(5).toList();
+          _stats = results[1] as Map<String, dynamic>;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      print('Error fetching donations: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      print('Error fetching dashboard data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -51,8 +63,8 @@ class _DonorDashboardState extends State<DonorDashboard> {
             // Header Section
             Container(
               width: double.infinity,
-              padding: EdgeInsets.fromLTRB(20, 60, 20, 30),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+              decoration: const BoxDecoration(
                 color: Color(0xFF2E7D32),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
@@ -68,7 +80,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Welcome Back,',
                             style: TextStyle(
                               color: Colors.white70,
@@ -76,13 +88,13 @@ class _DonorDashboardState extends State<DonorDashboard> {
                               fontFamily: 'Poppins',
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Consumer<ApiService>(
                             builder: (context, apiService, child) {
                               final name = apiService.userProfile?['name'] ?? 'User';
                               return Text(
                                 name,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -95,24 +107,38 @@ class _DonorDashboardState extends State<DonorDashboard> {
                       ),
                       Consumer<ApiService>(
                         builder: (context, apiService, child) {
+                          final profilePic = apiService.userProfile?['profilePicture'];
                           return CircleAvatar(
                             radius: 24,
                             backgroundColor: Colors.white,
-                            child: Icon(Icons.person, color: Color(0xFF2E7D32)),
+                            backgroundImage: profilePic != null
+                                ? NetworkImage('${ApiService.baseUrl}/api/upload/$profilePic')
+                                : null,
+                            child: profilePic == null
+                                ? const Icon(Icons.person, color: Color(0xFF2E7D32))
+                                : null,
                           );
                         },
                       ),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   // Stats Cards
                   Row(
                     children: [
                       _buildStatCard('Active', '${_recentDonations.length}', Icons.local_dining),
-                      SizedBox(width: 16),
-                      _buildStatCard('Impact', '150+', Icons.people),
-                      SizedBox(width: 16),
-                      _buildStatCard('Rating', '4.8', Icons.star),
+                      const SizedBox(width: 16),
+                      _buildStatCard(
+                        'Impact', 
+                        '${_stats['impact']?['peopleHelped'] ?? 0}', 
+                        Icons.people
+                      ),
+                      const SizedBox(width: 16),
+                      _buildStatCard(
+                        'Rating', 
+                        '${_stats['rating'] ?? 0.0}', 
+                        Icons.star
+                      ),
                     ],
                   ),
                 ],
@@ -120,11 +146,11 @@ class _DonorDashboardState extends State<DonorDashboard> {
             ),
 
             Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Quick Actions',
                     style: TextStyle(
                       fontSize: 18,
@@ -133,38 +159,38 @@ class _DonorDashboardState extends State<DonorDashboard> {
                       fontFamily: 'Poppins',
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       _buildActionCard(
                         'Donate Food',
                         Icons.add_circle_outline,
-                        Color(0xFFE8F5E9),
-                        Color(0xFF2E7D32),
+                        const Color(0xFFE8F5E9),
+                        const Color(0xFF2E7D32),
                         () async {
                           await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => PostDonationScreen()),
+                            MaterialPageRoute(builder: (context) => const PostDonationScreen()),
                           );
                           // Refresh donations after posting
-                          _fetchDonations();
+                          _fetchDashboardData();
                         },
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       _buildActionCard(
                         'History',
                         Icons.history,
-                        Color(0xFFFFF3E0),
+                        const Color(0xFFFFF3E0),
                         Colors.orange,
-                        () => _showComingSoonMessage('History'),
+                        () => Navigator.pushNamed(context, '/donation-history'),
                       ),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Recent Donations',
                         style: TextStyle(
                           fontSize: 18,
@@ -177,18 +203,18 @@ class _DonorDashboardState extends State<DonorDashboard> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => ActiveDonationsScreen()),
+                            MaterialPageRoute(builder: (context) => const ActiveDonationsScreen()),
                           );
                         },
-                        child: Text('View All'),
+                        child: const Text('View All'),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _isLoading
-                      ? Center(child: CircularProgressIndicator())
+                      ? const Center(child: CircularProgressIndicator())
                       : _recentDonations.isEmpty
-                          ? Center(
+                          ? const Center(
                               child: Padding(
                                 padding: EdgeInsets.all(32),
                                 child: Text(
@@ -218,7 +244,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
   Widget _buildStatCard(String title, String value, IconData icon) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
@@ -227,10 +253,10 @@ class _DonorDashboardState extends State<DonorDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: Colors.white, size: 20),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -239,7 +265,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
             ),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 12,
                 fontFamily: 'Poppins',
@@ -257,7 +283,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(16),
@@ -266,7 +292,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
                 color: Colors.grey.withOpacity(0.1),
                 spreadRadius: 1,
                 blurRadius: 5,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -274,10 +300,10 @@ class _DonorDashboardState extends State<DonorDashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, color: iconColor, size: 32),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black87,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Poppins',
@@ -305,8 +331,8 @@ class _DonorDashboardState extends State<DonorDashboard> {
     }
     
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -315,7 +341,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -328,16 +354,16 @@ class _DonorDashboardState extends State<DonorDashboard> {
               color: Colors.green.shade50,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(Icons.fastfood, color: Color(0xFF2E7D32), size: 30),
+            child: const Icon(Icons.fastfood, color: Color(0xFF2E7D32), size: 30),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   foodDescription,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -346,7 +372,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 if (quantityText.isNotEmpty)
                   Text(
                     quantityText,
@@ -356,9 +382,9 @@ class _DonorDashboardState extends State<DonorDashboard> {
                       fontFamily: 'Poppins',
                     ),
                   ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getStatusColor(status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -402,14 +428,14 @@ class _DonorDashboardState extends State<DonorDashboard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$feature feature coming soon!'),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         boxShadow: [
           BoxShadow(
             color: Color(0x33AAAAAA),
@@ -423,11 +449,11 @@ class _DonorDashboardState extends State<DonorDashboard> {
         currentIndex: _currentIndex,
         onTap: (index) => _handleNavigation(index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
+        selectedItemColor: const Color(0xFF2E7D32),
         unselectedItemColor: Colors.grey,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
           BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),
@@ -451,19 +477,19 @@ class _DonorDashboardState extends State<DonorDashboard> {
       case 1:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ActiveDonationsScreen()),
+          MaterialPageRoute(builder: (context) => const ActiveDonationsScreen()),
         );
         break;
       case 2:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ImpactScreen()),
+          MaterialPageRoute(builder: (context) => const ImpactScreen()),
         );
         break;
       case 3:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
         );
         break;
     }

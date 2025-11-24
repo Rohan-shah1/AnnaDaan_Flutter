@@ -713,6 +713,30 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  // Get Dashboard Stats
+  Future<Map<String, dynamic>> getDashboardStats() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/stats/dashboard'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['data'] ?? {};
+      } else {
+        print('Failed to fetch dashboard stats: ${response.body}');
+        return {};
+      }
+    } catch (e) {
+      print('Error fetching dashboard stats: $e');
+      return {};
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();

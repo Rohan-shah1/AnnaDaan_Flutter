@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import 'donor_dashboard.dart';
 import 'impact_screen.dart';
-import 'profile_screen.dart';
+import '../pages/profile_screen.dart';
 import 'post_donation_screen.dart';
 
 class ActiveDonationsScreen extends StatefulWidget {
@@ -405,7 +405,7 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
     switch (statusLower) {
       case 'pending':
         badgeColor = Colors.orange;
-        badgeText = 'PENDING';
+        badgeText = 'POSTED';
         break;
       case 'reserved':
         badgeColor = Colors.blue;

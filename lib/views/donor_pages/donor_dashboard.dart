@@ -4,7 +4,7 @@ import '../../services/api_service.dart';
 import 'post_donation_screen.dart';
 import 'active_donations_screen.dart';
 import 'impact_screen.dart';
-import 'profile_screen.dart';
+import '../pages/profile_screen.dart';
 
 class DonorDashboard extends StatefulWidget {
   const DonorDashboard({super.key});
@@ -390,7 +390,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    status.toUpperCase(),
+                    status.toLowerCase() == 'pending' ? 'POSTED' : status.toUpperCase(),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,

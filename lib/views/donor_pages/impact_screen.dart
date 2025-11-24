@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import 'donor_dashboard.dart';
 import 'active_donations_screen.dart';
-import 'profile_screen.dart';
+import '../pages/profile_screen.dart';
 
 class ImpactScreen extends StatefulWidget {
   const ImpactScreen({super.key});

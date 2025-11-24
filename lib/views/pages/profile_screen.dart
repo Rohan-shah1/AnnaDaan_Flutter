@@ -5,9 +5,7 @@ import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
 import 'help_support_screen.dart';
 import 'about_screen.dart';
-import 'donor_dashboard.dart';
-import 'active_donations_screen.dart';
-import 'impact_screen.dart';
+import '../donor_pages/donor_dashboard.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

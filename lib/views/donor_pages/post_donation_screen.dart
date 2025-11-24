@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import '../pages/location_picker.dart';
 
@@ -16,6 +18,7 @@ class PostDonationScreen extends StatefulWidget {
 
 class _PostDonationScreenState extends State<PostDonationScreen> {
   final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
 
   // Controllers for form fields
   final TextEditingController _foodDescriptionController = TextEditingController();
@@ -33,6 +36,10 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
   String? _selectedFoodType;
   String _selectedQuantityUnit = 'kg';
   String? _selectedDietaryInfo;
+  
+  // Image selection
+  File? _selectedImage;
+  String? _existingImageId;
 
   // Map display names to backend enum values
   final Map<String, String> _foodTypesMap = {
@@ -77,6 +84,9 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
         .key;
     if (_selectedFoodType == '') _selectedFoodType = null;
 
+    // Existing food image
+    _existingImageId = d['foodImage'];
+
     // Location
     if (d['location'] != null) {
       _addressController.text = d['location']['address'] ?? '';
@@ -101,25 +111,63 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
     if (d['safetyChecklist'] != null) {
       _foodSafetyChecklist['Stored at safe temperature'] = d['safetyChecklist']['temperatureChecked'] ?? false;
       _foodSafetyChecklist['Properly packaged/covered'] = d['safetyChecklist']['properlyPackaged'] ?? false;
-      _foodSafetyChecklist['Fresh and good quality'] = true; // Assuming true if existing, or add field to backend
+      _foodSafetyChecklist['Fresh and good quality'] = true;
       _foodSafetyChecklist['Labeled with prep time'] = d['safetyChecklist']['labeled'] ?? false;
     }
 
     // Additional Notes
     _additionalNotesController.text = d['additionalNotes'] ?? '';
-    
-    // Dietary Info - Note: Backend might not have this field explicitly in the snippet I saw, 
-    // but assuming it might be part of description or a separate field. 
-    // If it's not in backend, we might leave it or try to infer.
-    // For now, let's assume it's not stored or stored in a way we can't easily retrieve without schema change,
-    // OR we can just default it or leave empty. 
-    // Wait, I don't see dietary info in the create payload in the original file either!
-    // It was just a UI field? 
-    // Ah, looking at the original code:
-    // `_selectedDietaryInfo` was validated but NOT sent in the payload!
-    // That's a bug in the original code too. I should fix that while I'm here if I can, 
-    // but strictly speaking I should stick to the plan.
-    // However, for editing, if I can't retrieve it, I'll leave it null.
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image Source', style: TextStyle(fontFamily: 'Poppins')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Color(0xFF2E7D32)),
+              title: const Text('Camera', style: TextStyle(fontFamily: 'Poppins')),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Color(0xFF2E7D32)),
+              title: const Text('Gallery', style: TextStyle(fontFamily: 'Poppins')),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -139,6 +187,65 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
     return Text(
       title,
       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87, fontFamily: 'Poppins'),
+    );
+  }
+
+  // Image selection section
+  Widget _imageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_selectedImage != null || _existingImageId != null) ...[
+          Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+              image: _selectedImage != null
+                  ? DecorationImage(
+                      image: FileImage(_selectedImage!),
+                      fit: BoxFit.cover,
+                    )
+                  : _existingImageId != null
+                      ? DecorationImage(
+                          image: NetworkImage('${ApiService.baseUrl}/api/upload/$_existingImageId'),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _showImageSourceDialog,
+                icon: const Icon(Icons.add_photo_alternate),
+                label: Text(_selectedImage != null || _existingImageId != null ? 'Change Photo' : 'Add Food Photo'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF2E7D32),
+                  side: const BorderSide(color: Color(0xFF2E7D32)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            if (_selectedImage != null || _existingImageId != null) ...[
+              const SizedBox(width: 12),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedImage = null;
+                    _existingImageId = null;
+                  });
+                },
+                icon: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ],
+          ],
+        ),
+      ],
     );
   }
 
@@ -406,10 +513,10 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('ADDITIONAL NOTES (OPTIONAL)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey, fontFamily: 'Poppins')),
-        SizedBox(height: 8),
-        Text('Any special instructions, allergen info, etc.', style: TextStyle(fontSize: 14, color: Colors.grey, fontFamily: 'Poppins')),
-        SizedBox(height: 10),
+        const Text('ADDITIONAL NOTES (OPTIONAL)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey, fontFamily: 'Poppins')),
+        const SizedBox(height: 8),
+        const Text('Any special instructions, allergen info, etc.', style: TextStyle(fontSize: 14, color: Colors.grey, fontFamily: 'Poppins')),
+        const SizedBox(height: 10),
         TextFormField(
           controller: _additionalNotesController,
           maxLines: 3,
@@ -434,11 +541,9 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         onPressed: () async {
-          // Note: _selectedDietaryInfo is required by validation but not used in payload in original code.
-          // Keeping it as is to avoid breaking changes, but it's a bit weird.
           if (_formKey.currentState!.validate() && 
               _selectedFoodType != null && 
-              (_selectedDietaryInfo != null || isEditing) && // Relax dietary info check for editing if we can't restore it
+              (_selectedDietaryInfo != null || isEditing) &&
               _pickupStartTime != null &&
               _pickupEndTime != null) {
             
@@ -446,6 +551,20 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
             
             // Convert display name to backend enum value
             final backendFoodType = _foodTypesMap[_selectedFoodType];
+            
+            // Upload image if selected
+            String? foodImageId = _existingImageId;
+            if (_selectedImage != null) {
+              final uploadResult = await api.uploadFile(_selectedImage!);
+              if (uploadResult['success'] == true) {
+                foodImageId = uploadResult['file']['_id'];
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Image upload failed: ${uploadResult['message']}'), backgroundColor: Colors.red),
+                );
+                return;
+              }
+            }
             
             final payload = {
               'foodType': backendFoodType,
@@ -474,6 +593,10 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
               },
             };
             
+            if (foodImageId != null) {
+              payload['foodImage'] = foodImageId;
+            }
+            
             if (_additionalNotesController.text.isNotEmpty) {
               payload['additionalNotes'] = _additionalNotesController.text;
             }
@@ -492,7 +615,7 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
                   backgroundColor: Colors.green
                 ),
               );
-              Navigator.of(context).pop(true); // Return true to indicate refresh needed
+              Navigator.of(context).pop(true);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(result['message'] ?? 'Operation failed'), backgroundColor: Colors.red),
@@ -537,6 +660,10 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _sectionTitle('Food Photo'),
+                const SizedBox(height: 8),
+                _imageSection(),
+                const SizedBox(height: 20),
                 _sectionTitle('Food Type'),
                 _foodTypeSection(),
                 const SizedBox(height: 20),

@@ -343,7 +343,17 @@ class _DonorDashboardState extends State<DonorDashboard> {
     final foodDescription = donation['foodDescription'] ?? 'Food Donation';
     final status = donation['status'] ?? 'pending';
     final quantity = donation['quantity'];
-    final foodImageId = donation['foodImage'];
+    final rawFoodImage = donation['foodImage'];
+    
+    // Extract food image ID - handle string, object, or null
+    String? foodImageId;
+    if (rawFoodImage != null) {
+      if (rawFoodImage is String && rawFoodImage.isNotEmpty) {
+        foodImageId = rawFoodImage;
+      } else if (rawFoodImage is Map && rawFoodImage['_id'] != null) {
+        foodImageId = rawFoodImage['_id'].toString();
+      }
+    }
     
     String quantityText = '';
     if (quantity != null) {

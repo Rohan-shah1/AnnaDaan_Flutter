@@ -259,6 +259,17 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
     final status = donation['status'] ?? 'pending';
     final quantity = donation['quantity'];
     final location = donation['location'];
+    final rawFoodImage = donation['foodImage'];
+    
+    // Extract food image ID - handle string, object, or null
+    String? foodImageId;
+    if (rawFoodImage != null) {
+      if (rawFoodImage is String && rawFoodImage.isNotEmpty) {
+        foodImageId = rawFoodImage;
+      } else if (rawFoodImage is Map && rawFoodImage['_id'] != null) {
+        foodImageId = rawFoodImage['_id'].toString();
+      }
+    }
     
     String quantityText = '';
     if (quantity != null && quantity is Map) {
@@ -269,6 +280,7 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
     if (location != null && location is Map) {
       locationText = location['address'] ?? location['city'] ?? '';
     }
+
 
     return Container(
       width: double.infinity,
@@ -304,14 +316,14 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
                   decoration: BoxDecoration(
                     color: _getFoodTypeColor(foodType).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
-                    image: donation['foodImage'] != null
+                    image: foodImageId != null
                         ? DecorationImage(
-                            image: NetworkImage('${ApiService.baseUrl}/api/upload/${donation['foodImage']}'),
+                            image: NetworkImage('${ApiService.baseUrl}/api/upload/$foodImageId'),
                             fit: BoxFit.cover,
                           )
                         : null,
                   ),
-                  child: donation['foodImage'] == null
+                  child: foodImageId == null
                       ? Icon(
                           _getFoodTypeIcon(foodType),
                           color: _getFoodTypeColor(foodType),

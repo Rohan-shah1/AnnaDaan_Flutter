@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'google_signin_service.dart';
 
 class ApiService with ChangeNotifier {
   // Production backend URL
@@ -248,6 +249,13 @@ class ApiService with ChangeNotifier {
 
   // Logout
   Future<void> logout() async {
+    // Sign out from Google if signed in
+    try {
+      await GoogleSignInService.signOut();
+    } catch (e) {
+      print('⚠️ Error signing out from Google: $e');
+    }
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     await prefs.remove('user_profile');

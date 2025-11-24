@@ -4,6 +4,7 @@ import '../../services/api_service.dart';
 import 'donor_dashboard.dart';
 import 'impact_screen.dart';
 import 'profile_screen.dart';
+import 'post_donation_screen.dart';
 
 class ActiveDonationsScreen extends StatefulWidget {
   const ActiveDonationsScreen({super.key});
@@ -62,6 +63,64 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
     setState(() {
       _selectedCategory = category;
     });
+  }
+
+  Future<void> _handleEdit(Map<String, dynamic> donation) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostDonationScreen(donation: donation),
+      ),
+    );
+
+    if (result == true) {
+      _fetchDonations();
+    }
+  }
+
+  Future<void> _handleDelete(String donationId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Donation', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to delete this donation? This action cannot be undone.', style: TextStyle(fontFamily: 'Poppins')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel', style: TextStyle(fontFamily: 'Poppins', color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(fontFamily: 'Poppins', color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() => _isLoading = true);
+      try {
+        final api = Provider.of<ApiService>(context, listen: false);
+        final result = await api.deleteDonation(donationId);
+        
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Donation deleted successfully'), backgroundColor: Colors.green),
+          );
+          _fetchDonations();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result['message'] ?? 'Failed to delete donation'), backgroundColor: Colors.red),
+          );
+          setState(() => _isLoading = false);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -393,11 +452,9 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: View details
-              },
-              icon: const Icon(Icons.visibility_outlined, size: 18),
-              label: const Text('View Details'),
+              onPressed: () => _handleEdit(donation),
+              icon: const Icon(Icons.edit, size: 18),
+              label: const Text('Edit'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2E7D32),
                 foregroundColor: Colors.white,
@@ -411,13 +468,11 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: OutlinedButton.icon(
-              onPressed: () {
-                // TODO: Edit donation
-              },
-              icon: Icon(Icons.edit_outlined, size: 18, color: Colors.grey.shade700),
-              label: Text('Edit', style: TextStyle(color: Colors.grey.shade700)),
+              onPressed: () => _handleDelete(donation['_id']),
+              icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+              label: const Text('Delete', style: TextStyle(color: Colors.red)),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                side: const BorderSide(color: Colors.red, width: 1.5),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

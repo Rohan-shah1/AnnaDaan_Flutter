@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/api_service.dart';
 import 'donor_dashboard.dart';
 import 'active_donations_screen.dart';
 import 'profile_screen.dart';
@@ -12,13 +14,46 @@ class ImpactScreen extends StatefulWidget {
 
 class _ImpactScreenState extends State<ImpactScreen> {
   int _currentIndex = 2;
+  bool _isLoading = true;
+  Map<String, dynamic> _impactData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchImpactData();
+  }
+
+  Future<void> _fetchImpactData() async {
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      final result = await api.getImpactMetrics();
+      
+      if (mounted) {
+        setState(() {
+          if (result['success'] == true) {
+            _impactData = result['data'] ?? {};
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching impact data: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'My Impact',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -28,41 +63,53 @@ class _ImpactScreenState extends State<ImpactScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.black87),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => DonorDashboard()),
+              MaterialPageRoute(builder: (context) => const DonorDashboard()),
             );
           },
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Total Impact Section
-            _buildTotalImpactSection(),
+      body: _isLoading 
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _fetchImpactData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // Total Impact Section
+                    _buildTotalImpactSection(),
 
-            SizedBox(height: 32),
+                    const SizedBox(height: 32),
 
-            // Achievements Section
-            _buildAchievementsSection(),
-          ],
-        ),
-      ),
+                    // Achievements Section
+                    _buildAchievementsSection(),
+                  ],
+                ),
+              ),
+            ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
   Widget _buildTotalImpactSection() {
+    // Extract data with defaults
+    final foodSaved = _impactData['foodSaved'] ?? '0kg';
+    final estimatedMeals = _impactData['estimatedMeals']?.toString() ?? '0';
+    final totalDonations = _impactData['totalDonations']?.toString() ?? '0';
+    final peopleHelped = _impactData['peopleHelped']?.toString() ?? '0';
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Color(0xFF2E7D32), Color(0xFF4CAF50)],
@@ -72,13 +119,13 @@ class _ImpactScreenState extends State<ImpactScreen> {
           BoxShadow(
             color: Colors.green.shade200,
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         children: [
-          Text(
+          const Text(
             'Your Total Impact',
             style: TextStyle(
               fontSize: 20,
@@ -87,22 +134,22 @@ class _ImpactScreenState extends State<ImpactScreen> {
               fontFamily: 'Poppins',
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
           // Stats Grid
           Row(
             children: [
-              Expanded(child: _buildImpactStat('480kg', 'Food Donated', Icons.restaurant)),
-              SizedBox(width: 16),
-              Expanded(child: _buildImpactStat('960', 'Meals Served', Icons.people)),
+              Expanded(child: _buildImpactStat(foodSaved, 'Food Donated', Icons.restaurant)),
+              const SizedBox(width: 16),
+              Expanded(child: _buildImpactStat(estimatedMeals, 'Meals Served', Icons.people)),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildImpactStat('24', 'Donations', Icons.redeem)),
-              SizedBox(width: 16),
-              Expanded(child: _buildImpactStat('8', 'NGOs Helped', Icons.handshake)),
+              Expanded(child: _buildImpactStat(totalDonations, 'Donations', Icons.redeem)),
+              const SizedBox(width: 16),
+              Expanded(child: _buildImpactStat(peopleHelped, 'People Helped', Icons.handshake)),
             ],
           ),
         ],
@@ -114,24 +161,24 @@ class _ImpactScreenState extends State<ImpactScreen> {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: Colors.white, size: 24),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
             fontFamily: 'Poppins',
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
           textAlign: TextAlign.center,
@@ -148,7 +195,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
   Widget _buildAchievementsSection() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
@@ -157,7 +204,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Achievements',
             style: TextStyle(
               fontSize: 20,
@@ -166,11 +213,11 @@ class _ImpactScreenState extends State<ImpactScreen> {
               fontFamily: 'Poppins',
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Achievement Card
           _buildAchievementCard(),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildAchievementCard2(),
         ],
       ),
@@ -179,7 +226,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
 
   Widget _buildAchievementCard() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.amber.shade50,
         borderRadius: BorderRadius.circular(12),
@@ -188,7 +235,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
       child: Row(
         children: [
           Icon(Icons.emoji_events, color: Colors.amber.shade700, size: 32),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,7 +249,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
                     fontFamily: 'Poppins',
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   "You're in the top 10% of donors in your area!",
                   style: TextStyle(
@@ -220,8 +267,11 @@ class _ImpactScreenState extends State<ImpactScreen> {
   }
 
   Widget _buildAchievementCard2() {
+    // Dynamic text based on actual impact if available, otherwise generic
+    final foodSaved = _impactData['foodSaved'] ?? '480kg';
+    
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blue.shade50,
         borderRadius: BorderRadius.circular(12),
@@ -230,7 +280,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
       child: Row(
         children: [
           Icon(Icons.eco, color: Colors.blue.shade700, size: 32),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,9 +294,9 @@ class _ImpactScreenState extends State<ImpactScreen> {
                     fontFamily: 'Poppins',
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'Saved 480kg of food from waste!',
+                  'Saved $foodSaved of food from waste!',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.blue.shade700,
@@ -263,7 +313,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         boxShadow: [
           BoxShadow(
             color: Color(0x33AAAAAA),
@@ -282,11 +332,11 @@ class _ImpactScreenState extends State<ImpactScreen> {
           _handleNavigation(index);
         },
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
+        selectedItemColor: const Color(0xFF2E7D32),
         unselectedItemColor: Colors.grey,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
           BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),
@@ -301,13 +351,13 @@ class _ImpactScreenState extends State<ImpactScreen> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DonorDashboard()),
+          MaterialPageRoute(builder: (context) => const DonorDashboard()),
         );
         break;
       case 1:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ActiveDonationsScreen()),
+          MaterialPageRoute(builder: (context) => const ActiveDonationsScreen()),
         );
         break;
       case 2:
@@ -316,7 +366,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
       case 3:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
         );
         break;
     }

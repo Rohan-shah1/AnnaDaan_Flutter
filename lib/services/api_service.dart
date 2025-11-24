@@ -688,6 +688,31 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  // ----------------- STATS -----------------
+
+  // Get Impact Metrics
+  Future<Map<String, dynamic>> getImpactMetrics() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/stats/impact'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return {'success': true, 'data': data['data']};
+      } else {
+        final data = json.decode(response.body);
+        return {'success': false, 'message': data['message'] ?? 'Failed to fetch impact metrics'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();

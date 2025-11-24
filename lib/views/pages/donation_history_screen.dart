@@ -60,8 +60,36 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
       }).toList();
     }
     
-    // Show only completed donations
-    return filtered.where((don) => don['status'] == 'Completed').toList();
+    // Show completed and picked up donations
+    return filtered.where((don) {
+      final status = don['status']?.toString().toLowerCase();
+      return status == 'completed' || status == 'picked_up';
+    }).map((don) {
+      // Map backend fields to UI fields
+      return {
+        'title': don['foodDescription'] ?? 'Food Donation',
+        'time': _formatDate(don['createdAt']),
+        'organization': don['reservedBy']?['organizationName'] ?? 'Unknown Receiver',
+        'impact': 'Helped ${don['quantity']?['value'] ?? 0} people', // Estimate
+        'type': _formatFoodType(don['foodType']),
+        'quantity': '${don['quantity']?['value']} ${don['quantity']?['unit']}',
+        'status': don['status'],
+        'id': don['_id'],
+        ...don,
+      };
+    }).toList();
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return '';
+    final date = DateTime.tryParse(dateStr);
+    if (date == null) return '';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatFoodType(String? type) {
+    if (type == null) return '';
+    return type.split('_').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
   }
 
   void _setTimeFilter(String filter) {

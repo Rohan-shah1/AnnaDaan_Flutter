@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../../services/api_service.dart';
 
@@ -12,17 +13,23 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  int _currentIndex = 3;
-  bool _isLoading = true;
-  bool _isSaving = false;
-  File? _imageFile;
-
+  final _formKey = GlobalKey<FormState>();
+  final ImagePicker _imagePicker = ImagePicker();
+  
+  // Controllers
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _organizationTypeController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
+  
+  // State
+  File? _selectedProfileImage;
+  File? _selectedVerificationDoc;
+  String? _existingProfilePic;
+  String? _existingVerificationDoc;
+  String? _verificationStatus;
+  bool _isLoading = true;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -31,182 +38,127 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _loadProfile() async {
-    try {
-      final apiService = Provider.of<ApiService>(context, listen: false);
-      final profile = apiService.userProfile;
-      
-      if (profile != null) {
-        setState(() {
-          _nameController.text = profile['name'] ?? '';
-          _emailController.text = profile['email'] ?? '';
-          _phoneController.text = profile['phone'] ?? '';
-          _addressController.text = profile['address'] ?? '';
-          _organizationTypeController.text = profile['organizationType'] ?? '';
-          _cityController.text = profile['city'] ?? '';
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error loading profile: $e');
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final profile = apiService.userProfile;
+    
+    if (profile != null) {
       setState(() {
+        _nameController.text = profile['name'] ?? '';
+        _phoneController.text = profile['phone'] ?? '';
+        _addressController.text = profile['address'] ?? '';
+        _cityController.text = profile['city'] ?? '';
+        _existingProfilePic = profile['profilePicture'];
+        _existingVerificationDoc = profile['verificationDocument'];
+        _verificationStatus = profile['verificationStatus'];
         _isLoading = false;
       });
     }
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    _organizationTypeController.dispose();
-    _cityController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickImage() async {
+  Future<void> _pickProfileImage() async {
     try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? pickedFile = await picker.pickImage(
+      final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 800,
-        maxHeight: 800,
+        maxWidth: 512,
+        maxHeight: 512,
         imageQuality: 85,
       );
 
-      if (pickedFile != null) {
+      if (image != null) {
         setState(() {
-          _imageFile = File(pickedFile.path);
+          _selectedProfileImage = File(image.path);
         });
-
-        // Upload image immediately
-        await _uploadProfilePicture();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error picking image: $e', style: TextStyle(fontFamily: 'Poppins')),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error picking image: $e'), backgroundColor: Colors.red),
       );
     }
   }
 
-  Future<void> _uploadProfilePicture() async {
-    if (_imageFile == null) return;
-
+  Future<void> _pickVerificationDocument() async {
     try {
-      setState(() {
-        _isSaving = true;
-      });
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'docx'],
+      );
 
-      final apiService = Provider.of<ApiService>(context, listen: false);
-      final result = await apiService.uploadFile(_imageFile!);
-
-      if (result['success']) {
-        // Update profile with new image ID
-        final fileId = result['file']['_id'];
-        await apiService.updateProfile({'profilePicture': fileId});
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile picture updated!', style: TextStyle(fontFamily: 'Poppins')),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Upload failed', style: TextStyle(fontFamily: 'Poppins')),
-            backgroundColor: Colors.red,
-          ),
-        );
+      if (result != null) {
+        setState(() {
+          _selectedVerificationDoc = File(result.files.single.path!);
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error uploading image: $e', style: TextStyle(fontFamily: 'Poppins')),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error picking document: $e'), backgroundColor: Colors.red),
       );
-    } finally {
-      setState(() {
-        _isSaving = false;
-      });
     }
   }
 
-  Future<void> _saveChanges() async {
-    // Validate form
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please fill all required fields', style: TextStyle(fontFamily: 'Poppins')),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isSaving = true;
-    });
+    setState(() => _isSaving = true);
 
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
       
-      final profileData = {
+      // Upload profile image if selected
+      String? profilePicId = _existingProfilePic;
+      if (_selectedProfileImage != null) {
+        final uploadResult = await apiService.uploadFile(_selectedProfileImage!);
+        if (uploadResult['success'] == true) {
+          profilePicId = uploadResult['file']['_id'];
+        }
+      }
+
+      // Upload verification document if selected
+      String? verificationDocId = _existingVerificationDoc;
+      if (_selectedVerificationDoc != null) {
+        final uploadResult = await apiService.uploadFile(_selectedVerificationDoc!);
+        if (uploadResult['success'] == true) {
+          verificationDocId = uploadResult['file']['_id'];
+        }
+      }
+
+      // Update profile
+      final payload = {
         'name': _nameController.text,
         'phone': _phoneController.text,
         'address': _addressController.text,
-        if (_organizationTypeController.text.isNotEmpty)
-          'organizationType': _organizationTypeController.text,
-        if (_cityController.text.isNotEmpty)
-          'city': _cityController.text,
+        'city': _cityController.text,
       };
 
-      final result = await apiService.updateProfile(profileData);
+      if (profilePicId != null) {
+        payload['profilePicture'] = profilePicId;
+      }
 
-      if (result['success']) {
+      if (verificationDocId != null) {
+        payload['verificationDocument'] = verificationDocId;
+        // Set status to pending when new document is uploaded
+        if (_selectedVerificationDoc != null) {
+          payload['verificationStatus'] = 'pending';
+        }
+      }
+
+      final result = await apiService.updateProfile(payload);
+
+      if (result['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile updated successfully!', style: TextStyle(fontFamily: 'Poppins')),
-            backgroundColor: Colors.green,
-          ),
+          const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Colors.green),
         );
-
-        // Navigate back after save
-        Future.delayed(Duration(milliseconds: 1500), () {
-          if (mounted) {
-            Navigator.of(context).pop();
-          }
-        });
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Update failed', style: TextStyle(fontFamily: 'Poppins')),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(result['message'] ?? 'Failed to update profile'), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e', style: TextStyle(fontFamily: 'Poppins')),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     } finally {
-      setState(() {
-        _isSaving = false;
-      });
+      setState(() => _isSaving = false);
     }
   }
 
@@ -214,299 +166,282 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(
-            'Edit Profile',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black87),
-        ),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text('Edit Profile')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          'Edit Profile',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
-        actions: [
-          IconButton(
-            icon: _isSaving ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ) : Icon(Icons.save),
-            onPressed: _isSaving ? null : _saveChanges,
-          ),
-        ],
+        title: const Text('Edit Profile', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF2E7D32),
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Profile Picture Section
-            _buildProfilePicture(),
-            SizedBox(height: 32),
-
-            // Form Fields
-            _buildFormFields(),
-            SizedBox(height: 32),
-
-            // Save Button
-            _buildSaveButton(),
-          ],
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Picture Section
+              _buildProfilePictureSection(),
+              const SizedBox(height: 24),
+              
+              // Basic Information
+              _buildSectionTitle('Basic Information'),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+                validator: (v) => (v == null || v.isEmpty) ? 'Enter your name' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.phone),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _addressController,
+                decoration: const InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.location_on),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _cityController,
+                decoration: const InputDecoration(
+                  labelText: 'City',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.location_city),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Verification Document Section
+              _buildVerificationSection(),
+              
+              const SizedBox(height: 32),
+              
+              // Save Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : _saveProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Save Changes',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Poppins'),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
-  Widget _buildProfilePicture() {
-    final apiService = Provider.of<ApiService>(context);
-    final profile = apiService.userProfile;
-    
-    return Column(
-      children: [
-        Stack(
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Color(0xFF2E7D32),
-              backgroundImage: _imageFile != null
-                  ? FileImage(_imageFile!)
-                  : (profile?['profilePicture'] != null
-                      ? NetworkImage('${ApiService.baseUrl}/api/upload/${profile!['profilePicture']}')
-                      : null) as ImageProvider?,
-              child: _imageFile == null && profile?['profilePicture'] == null
-                  ? Icon(
-                      profile?['role'] == 'donor' ? Icons.restaurant : Icons.business,
-                      size: 50,
-                      color: Colors.white,
-                    )
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
+    );
+  }
+
+  Widget _buildProfilePictureSection() {
+    return Center(
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: _pickProfileImage,
+            child: CircleAvatar(
+              radius: 60,
+              backgroundColor: Colors.grey[300],
+              backgroundImage: _selectedProfileImage != null
+                  ? FileImage(_selectedProfileImage!)
+                  : _existingProfilePic != null
+                      ? NetworkImage('${ApiService.baseUrl}/api/upload/$_existingProfilePic')
+                      : null,
+              child: _selectedProfileImage == null && _existingProfilePic == null
+                  ? const Icon(Icons.person, size: 60, color: Colors.grey)
                   : null,
             ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: InkWell(
-                onTap: _isSaving ? null : _pickImage,
-                child: Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade600,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: _pickProfileImage,
+            icon: const Icon(Icons.camera_alt),
+            label: const Text('Change Photo'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerificationSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildSectionTitle('Verification Document'),
+            const SizedBox(width: 8),
+            if (_verificationStatus != null) _buildVerificationBadge(),
           ],
         ),
-        SizedBox(height: 12),
-        TextButton(
-          onPressed: _isSaving ? null : _pickImage,
-          child: Text(
-            _isSaving ? 'Uploading...' : 'Change Photo',
+        const SizedBox(height: 8),
+        Text(
+          'Upload ID, license, or official documents for verification',
+          style: TextStyle(fontSize: 14, color: Colors.grey[600], fontFamily: 'Poppins'),
+        ),
+        const SizedBox(height: 12),
+        
+        if (_selectedVerificationDoc != null || _existingVerificationDoc != null)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _selectedVerificationDoc != null
+                      ? Icons.insert_drive_file
+                      : Icons.cloud_done,
+                  color: const Color(0xFF2E7D32),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _selectedVerificationDoc != null
+                        ? _selectedVerificationDoc!.path.split('/').last
+                        : 'Document uploaded',
+                    style: const TextStyle(fontFamily: 'Poppins'),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    setState(() {
+                      _selectedVerificationDoc = null;
+                      _existingVerificationDoc = null;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        
+        const SizedBox(height: 12),
+        
+        OutlinedButton.icon(
+          onPressed: _pickVerificationDocument,
+          icon: const Icon(Icons.upload_file),
+          label: Text(_selectedVerificationDoc != null || _existingVerificationDoc != null
+              ? 'Change Document'
+              : 'Upload Document'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFF2E7D32),
+            side: const BorderSide(color: Color(0xFF2E7D32)),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Supported formats: JPG, PNG, PDF, DOCX',
+          style: TextStyle(fontSize: 12, color: Colors.grey[600], fontFamily: 'Poppins'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVerificationBadge() {
+    Color color;
+    String text;
+    IconData icon;
+
+    switch (_verificationStatus) {
+      case 'pending':
+        color = Colors.orange;
+        text = 'PENDING';
+        icon = Icons.schedule;
+        break;
+      case 'verified':
+        color = Colors.green;
+        text = 'VERIFIED';
+        icon = Icons.verified;
+        break;
+      case 'rejected':
+        color = Colors.red;
+        text = 'REJECTED';
+        icon = Icons.cancel;
+        break;
+      default:
+        color = Colors.grey;
+        text = 'NOT VERIFIED';
+        icon = Icons.info;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
             style: TextStyle(
-              color: Color(0xFF2E7D32),
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: color,
               fontFamily: 'Poppins',
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFormFields() {
-    return Column(
-      children: [
-        _buildTextField(
-          label: 'NAME',
-          controller: _nameController,
-          icon: Icons.person,
-        ),
-        SizedBox(height: 20),
-        _buildTextField(
-          label: 'EMAIL ADDRESS',
-          controller: _emailController,
-          icon: Icons.email,
-          keyboardType: TextInputType.emailAddress,
-          enabled: false, // Email typically shouldn't be editable
-        ),
-        SizedBox(height: 20),
-        _buildTextField(
-          label: 'PHONE NUMBER',
-          controller: _phoneController,
-          icon: Icons.phone,
-          keyboardType: TextInputType.phone,
-        ),
-        SizedBox(height: 20),
-        _buildTextField(
-          label: 'ORGANIZATION TYPE',
-          controller: _organizationTypeController,
-          icon: Icons.business,
-        ),
-        SizedBox(height: 20),
-        _buildTextField(
-          label: 'CITY',
-          controller: _cityController,
-          icon: Icons.location_city,
-        ),
-        SizedBox(height: 20),
-        _buildTextField(
-          label: 'ADDRESS',
-          controller: _addressController,
-          icon: Icons.location_on,
-          maxLines: 3,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-    bool enabled = true,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      enabled: enabled,
-      style: TextStyle(fontFamily: 'Poppins'),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(
-          color: Colors.grey.shade600,
-          fontFamily: 'Poppins',
-          fontWeight: FontWeight.w500,
-        ),
-        prefixIcon: Icon(icon, color: Color(0xFF2E7D32)),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Color(0xFF2E7D32), width: 2),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
-        ),
-        filled: !enabled,
-        fillColor: !enabled ? Colors.grey.shade100 : null,
-      ),
-    );
-  }
-
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isSaving ? null : _saveChanges,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF2E7D32),
-          padding: EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _isSaving
-            ? SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Text(
-                'Save Changes',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontFamily: 'Poppins',
-                ),
-              ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x33AAAAAA),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => _handleNavigation(index),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
-          BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ' Profile'),
         ],
       ),
     );
   }
 
-  void _handleNavigation(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/donor-dashboard');
-        break;
-      case 1:
-        Navigator.pushReplacementNamed(context, '/active-donations');
-        break;
-      case 2:
-        Navigator.pushReplacementNamed(context, '/impact-screen');
-        break;
-      case 3:
-        Navigator.pushReplacementNamed(context, '/profile-screen');
-        break;
-    }
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    super.dispose();
   }
 }

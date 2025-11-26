@@ -144,32 +144,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           SizedBox(height: 16),
 
-          // Badge
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Color(0xFFE8F5E9),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.verified,
-                  color: Color(0xFF2E7D32),
-                  size: 16,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  'Verified ${userType == 'donor' ? 'Donor' : 'Receiver'}',
-                  style: TextStyle(
-                    color: Color(0xFF2E7D32),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ],
+          // Verification Badge - Dynamic based on status
+          _buildVerificationBadge(userType),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerificationBadge(String userType) {
+    final verificationStatus = _userProfile?['verificationStatus'];
+    
+    // Determine badge color, icon, and text based on status
+    Color badgeColor;
+    Color backgroundColor;
+    IconData icon;
+    String text;
+
+    switch (verificationStatus) {
+      case 'approved':
+      case 'verified':
+        // Verified status - green
+        badgeColor = Color(0xFF2E7D32);
+        backgroundColor = Color(0xFFE8F5E9);
+        icon = Icons.verified;
+        text = 'Verified ${userType == 'donor' ? 'Donor' : 'Receiver'}';
+        break;
+      case 'pending':
+        // Pending status - orange/amber
+        badgeColor = Color(0xFFF57C00);
+        backgroundColor = Color(0xFFFFF3E0);
+        icon = Icons.hourglass_empty;
+        text = 'Verification Pending';
+        break;
+      case 'rejected':
+        // Rejected status - red
+        badgeColor = Color(0xFFD32F2F);
+        backgroundColor = Color(0xFFFFEBEE);
+        icon = Icons.cancel;
+        text = 'Verification Required';
+        break;
+      default:
+        // No verification document or null status - grey
+        badgeColor = Colors.grey.shade600;
+        backgroundColor = Colors.grey.shade100;
+        icon = Icons.info_outline;
+        text = 'Not Verified';
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: badgeColor,
+            size: 16,
+          ),
+          SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              color: badgeColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              fontFamily: 'Poppins',
             ),
           ),
         ],

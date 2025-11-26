@@ -287,8 +287,14 @@ class ApiService with ChangeNotifier {
         mediaType = MediaType('image', 'jpeg');
       } else if (extension == 'png') {
         mediaType = MediaType('image', 'png');
+      } else if (extension == 'gif') {
+        mediaType = MediaType('image', 'gif');
       } else if (extension == 'pdf') {
         mediaType = MediaType('application', 'pdf');
+      } else if (extension == 'docx') {
+        mediaType = MediaType('application', 'vnd.openxmlformats-officedocument.wordprocessingml.document');
+      } else if (extension == 'doc') {
+        mediaType = MediaType('application', 'msword');
       } else {
         mediaType = MediaType('application', 'octet-stream');
       }

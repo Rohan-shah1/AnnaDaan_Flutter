@@ -30,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? _verificationStatus;
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _documentDeleted = false; // Track if user explicitly deleted document
 
   @override
   void initState() {
@@ -122,7 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       // Update profile
-      final payload = {
+      final Map<String, dynamic> payload = {
         'name': _nameController.text,
         'phone': _phoneController.text,
         'address': _addressController.text,
@@ -133,7 +134,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         payload['profilePicture'] = profilePicId;
       }
 
-      if (verificationDocId != null) {
+      // Handle verification document
+      if (_documentDeleted) {
+        // User deleted the document - explicitly set to null
+        payload['verificationDocument'] = null;
+        payload['verificationStatus'] = null;
+      } else if (verificationDocId != null) {
+        // Document exists (either new or existing)
         payload['verificationDocument'] = verificationDocId;
         // Set status to pending when new document is uploaded
         if (_selectedVerificationDoc != null) {
@@ -329,33 +336,99 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.grey[300]!),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  _selectedVerificationDoc != null
-                      ? Icons.insert_drive_file
-                      : Icons.cloud_done,
-                  color: const Color(0xFF2E7D32),
+                Row(
+                  children: [
+                    Icon(
+                      _selectedVerificationDoc != null
+                          ? Icons.insert_drive_file
+                          : Icons.cloud_done,
+                      color: const Color(0xFF2E7D32),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _selectedVerificationDoc != null
+                            ? _selectedVerificationDoc!.path.split('/').last
+                            : 'Document uploaded',
+                        style: const TextStyle(fontFamily: 'Poppins'),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        setState(() {
+                          _selectedVerificationDoc = null;
+                          _existingVerificationDoc = null;
+                          _documentDeleted = true; // Mark as deleted
+                        });
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _selectedVerificationDoc != null
-                        ? _selectedVerificationDoc!.path.split('/').last
-                        : 'Document uploaded',
-                    style: const TextStyle(fontFamily: 'Poppins'),
-                    overflow: TextOverflow.ellipsis,
+                if (_existingVerificationDoc != null && _selectedVerificationDoc == null) ...[
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      '${ApiService.baseUrl}/api/upload/$_existingVerificationDoc',
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 100,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.description, size: 40, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Document Preview Unavailable',
+                                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    setState(() {
-                      _selectedVerificationDoc = null;
-                      _existingVerificationDoc = null;
-                    });
-                  },
-                ),
+                ],
+                if (_selectedVerificationDoc != null) ...[
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      _selectedVerificationDoc!,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 100,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.description, size: 40, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Preview Unavailable',
+                                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

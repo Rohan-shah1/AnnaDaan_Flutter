@@ -11,11 +11,11 @@ class ReceiverBrowseScreen extends StatefulWidget {
 }
 
 class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
-  String _selectedCategory = 'Nearby'; // Default to Nearby
+  String _selectedCategory = 'All'; // Default to All
   
   final List<String> _categories = [
-    'Nearby',
     'All',
+    'Nearby',
     'Cooked Meals',
     'Fruits & Veg',
     'Bakery & Dairy'
@@ -49,15 +49,12 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
         nearby = await apiService.getNearbyDonations(
           lat: position.latitude, 
           lng: position.longitude,
-          maxDistance: 10000
+          maxDistance: 10
         );
       }
       
       // Fetch all donations (using search endpoint)
-      final all = await apiService.searchDonations(
-        lat: position?.latitude,
-        lng: position?.longitude
-      );
+      final all = await apiService.searchDonations();
 
       if (mounted) {
         setState(() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../services/api_service.dart';
 
 class ReceiverBrowseScreen extends StatefulWidget {
@@ -16,10 +17,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     'Nearby',
     'All',
     'Cooked Meals',
-    'Vegetables',
-    'Fruits',
-    'Bakery',
-    'Dairy'
+    'Fruits & Veg',
+    'Bakery & Dairy'
   ];
 
   List<dynamic> _allDonations = [];
@@ -36,11 +35,29 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
       
-      // Fetch nearby donations (10km radius)
-      final nearby = await apiService.getNearbyDonations(maxDistance: 10000);
+      // Get current location
+      Position? position;
+      try {
+        position = await _determinePosition();
+      } catch (e) {
+        print('Error getting location: $e');
+      }
+
+      // Fetch nearby donations (10km radius) if location available
+      List<dynamic> nearby = [];
+      if (position != null) {
+        nearby = await apiService.getNearbyDonations(
+          lat: position.latitude, 
+          lng: position.longitude,
+          maxDistance: 10000
+        );
+      }
       
-      // Fetch all donations (no distance limit)
-      final all = await apiService.getNearbyDonations();
+      // Fetch all donations (using search endpoint)
+      final all = await apiService.searchDonations(
+        lat: position?.latitude,
+        lng: position?.longitude
+      );
 
       if (mounted) {
         setState(() {
@@ -59,6 +76,30 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     }
   }
 
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+    } 
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Filter logic
@@ -68,10 +109,19 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     } else if (_selectedCategory == 'All') {
       filteredDonations = _allDonations;
     } else {
-      filteredDonations = _allDonations.where((donation) => 
-        donation['category'] == _selectedCategory || 
-        donation['foodType'] == _selectedCategory
-      ).toList();
+      filteredDonations = _allDonations.where((donation) {
+        final foodType = donation['foodType']?.toString().toLowerCase() ?? '';
+        switch (_selectedCategory) {
+          case 'Cooked Meals':
+            return foodType.contains('cooked');
+          case 'Fruits & Veg':
+            return foodType == 'fruits' || foodType == 'vegetables';
+          case 'Bakery & Dairy':
+            return foodType == 'bakery' || foodType == 'dairy';
+          default:
+            return true;
+        }
+      }).toList();
     }
 
     return Column(
@@ -342,9 +392,9 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  donation['foodType'] ?? 'N/A',
-                  style: const TextStyle(
-                    color: Color(0xFF1565C0),
+                  _getFoodTypeLabel(donation['foodType'] ?? ''),
+                  style: TextStyle(
+                    color: _getFoodTypeColor(donation['foodType'] ?? ''),
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Poppins',
@@ -468,5 +518,27 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
         ],
       ),
     );
+  }
+
+  String _getFoodTypeLabel(String foodType) {
+    final typeLower = foodType.toLowerCase();
+    if (typeLower == 'cooked_meals_veg') return 'COOKED VEG';
+    if (typeLower == 'cooked_meals_nonveg') return 'COOKED NON-VEG';
+    if (typeLower == 'fruits') return 'FRUITS';
+    if (typeLower == 'vegetables') return 'VEGETABLES';
+    if (typeLower == 'bakery') return 'BAKERY';
+    if (typeLower == 'dairy') return 'DAIRY';
+    return foodType.toUpperCase().replaceAll('_', ' ');
+  }
+
+  Color _getFoodTypeColor(String foodType) {
+    final typeLower = foodType.toLowerCase();
+    if (typeLower == 'cooked_meals_veg') return const Color(0xFF4CAF50);
+    if (typeLower == 'cooked_meals_nonveg') return const Color(0xFFFF5722);
+    if (typeLower == 'fruits') return const Color(0xFFFF9800);
+    if (typeLower == 'vegetables') return const Color(0xFF8BC34A);
+    if (typeLower == 'bakery') return const Color(0xFF795548);
+    if (typeLower == 'dairy') return const Color(0xFF2196F3);
+    return const Color(0xFF1565C0);
   }
 }

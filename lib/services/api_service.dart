@@ -430,6 +430,42 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  // Search Donations (Receiver - All/Filtered)
+  Future<List<dynamic>> searchDonations({String? city, String? foodType, double? lat, double? lng}) async {
+    try {
+      String url = '$baseUrl/api/donations/search/available';
+      List<String> queryParams = [];
+      
+      if (city != null) queryParams.add('city=$city');
+      if (foodType != null) queryParams.add('foodType=$foodType');
+      if (lat != null) queryParams.add('lat=$lat');
+      if (lng != null) queryParams.add('lng=$lng');
+      
+      if (queryParams.isNotEmpty) {
+        url += '?${queryParams.join('&')}';
+      }
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['donations'] ?? [];
+      } else {
+        print('Failed to search donations: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Error searching donations: $e');
+      return [];
+    }
+  }
+
   // Get Single Donation
   Future<Map<String, dynamic>?> getDonation(String id) async {
     try {

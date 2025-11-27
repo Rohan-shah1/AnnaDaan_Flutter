@@ -47,12 +47,12 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
     return _donations.where((donation) {
       final foodType = donation['foodType']?.toString().toLowerCase() ?? '';
       switch (_selectedCategory) {
-        case 'Cooked Food':
+        case 'Cooked Meals':
           return foodType.contains('cooked');
-        case 'Raw/Produce':
-          return foodType.contains('raw') || foodType.contains('vegetable');
-        case 'Packaged Meals':
-          return foodType.contains('packaged');
+        case 'Fruits & Veg':
+          return foodType == 'fruits' || foodType == 'vegetables';
+        case 'Bakery & Dairy':
+          return foodType == 'bakery' || foodType == 'dairy';
         default:
           return true;
       }
@@ -162,7 +162,7 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
   }
 
   Widget _buildCategoryFilter() {
-    const categories = ['All', 'Cooked Food', 'Raw/Produce', 'Packaged Meals'];
+    const categories = ['All', 'Cooked Meals', 'Fruits & Veg', 'Bakery & Dairy'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -511,27 +511,32 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
   IconData _getFoodTypeIcon(String foodType) {
     final typeLower = foodType.toLowerCase();
     if (typeLower.contains('cooked')) return Icons.restaurant;
-    if (typeLower.contains('raw') || typeLower.contains('vegetable')) return Icons.grass;
-    if (typeLower.contains('packaged')) return Icons.inventory_2;
+    if (typeLower == 'fruits' || typeLower == 'vegetables') return Icons.eco;
+    if (typeLower == 'bakery') return Icons.breakfast_dining;
+    if (typeLower == 'dairy') return Icons.local_drink;
     return Icons.fastfood;
   }
 
   Color _getFoodTypeColor(String foodType) {
     final typeLower = foodType.toLowerCase();
-    if (typeLower.contains('cooked_veg')) return const Color(0xFF4CAF50);
-    if (typeLower.contains('cooked_non_veg')) return const Color(0xFFFF5722);
-    if (typeLower.contains('raw') || typeLower.contains('vegetable')) return const Color(0xFF8BC34A);
-    if (typeLower.contains('packaged')) return const Color(0xFF2196F3);
+    if (typeLower == 'cooked_meals_veg') return const Color(0xFF4CAF50);
+    if (typeLower == 'cooked_meals_nonveg') return const Color(0xFFFF5722);
+    if (typeLower == 'fruits') return const Color(0xFFFF9800);
+    if (typeLower == 'vegetables') return const Color(0xFF8BC34A);
+    if (typeLower == 'bakery') return const Color(0xFF795548);
+    if (typeLower == 'dairy') return const Color(0xFF2196F3);
     return const Color(0xFF9E9E9E);
   }
 
   String _getFoodTypeLabel(String foodType) {
     final typeLower = foodType.toLowerCase();
-    if (typeLower.contains('cooked_veg')) return 'COOKED VEGETARIAN';
-    if (typeLower.contains('cooked_non_veg')) return 'COOKED NON-VEG';
-    if (typeLower.contains('raw')) return 'RAW VEGETABLES';
-    if (typeLower.contains('packaged')) return 'PACKAGED MEALS';
-    return foodType.toUpperCase();
+    if (typeLower == 'cooked_meals_veg') return 'COOKED VEG';
+    if (typeLower == 'cooked_meals_nonveg') return 'COOKED NON-VEG';
+    if (typeLower == 'fruits') return 'FRUITS';
+    if (typeLower == 'vegetables') return 'VEGETABLES';
+    if (typeLower == 'bakery') return 'BAKERY';
+    if (typeLower == 'dairy') return 'DAIRY';
+    return foodType.toUpperCase().replaceAll('_', ' ');
   }
 
   Widget _buildBottomNavigationBar() {

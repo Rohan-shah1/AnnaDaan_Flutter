@@ -12,7 +12,6 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   List<dynamic> _notifications = [];
   bool _isLoading = true;
-  int _currentIndex = 3;
 
   @override
   void initState() {
@@ -123,7 +122,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     return _buildNotificationItem(notification);
                   },
                 ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -447,53 +445,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         duration: Duration(seconds: 2),
       ),
     );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x33AAAAAA),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => _handleNavigation(index),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
-          BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
-  void _handleNavigation(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/donor-dashboard');
-        break;
-      case 1:
-        Navigator.pushReplacementNamed(context, '/active-donations');
-        break;
-      case 2:
-        Navigator.pushReplacementNamed(context, '/impact-screen');
-        break;
-      case 3:
-      // Already on notifications screen
-        break;
-    }
   }
 
   Color _getNotificationColor(String type) {

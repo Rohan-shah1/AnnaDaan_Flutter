@@ -43,11 +43,15 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
 
   // Map display names to backend enum values
   final Map<String, String> _foodTypesMap = {
-    'Cooked Vegetarian': 'cooked_veg',
-    'Cooked Non-Vegetarian': 'cooked_non_veg',
-    'Packaged Meals': 'packaged_meals',
-    'Raw Vegetables/Fruits': 'raw_vegetables',
+    'Cooked Vegetarian': 'cooked_meals_veg',
+    'Cooked Non-Vegetarian': 'cooked_meals_nonveg',
+    'Fruits':'fruits',
+    'Vegetables':'vegetables',
+    'Bakery':'bakery',
+    'Dairy':'dairy',
   };
+
+
 
   // Safety checklist
   final Map<String, bool> _foodSafetyChecklist = {

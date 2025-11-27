@@ -6,7 +6,9 @@ import 'active_donations_screen.dart';
 import '../pages/profile_screen.dart';
 
 class ImpactScreen extends StatefulWidget {
-  const ImpactScreen({super.key});
+  final bool showBottomNav;
+  
+  const ImpactScreen({super.key, this.showBottomNav = true});
 
   @override
   _ImpactScreenState createState() => _ImpactScreenState();
@@ -50,12 +52,22 @@ class _ImpactScreenState extends State<ImpactScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get user type to adapt UI
+    final userProfile = Provider.of<ApiService>(context).userProfile;
+    final userType = userProfile?['userType'] ?? 'donor';
+    final isDonor = userType == 'donor';
+
+    // Theme colors based on user type
+    final primaryColor = isDonor ? const Color(0xFF2E7D32) : const Color(0xFF1565C0);
+    final lightColor = isDonor ? const Color(0xFF4CAF50) : const Color(0xFF1976D2);
+    final shadowColor = isDonor ? Colors.green.shade200 : Colors.blue.shade200;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'My Impact',
-          style: TextStyle(
+        title: Text(
+          isDonor ? 'My Impact' : 'Our Impact',
+          style: const TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -64,15 +76,20 @@ class _ImpactScreenState extends State<ImpactScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
-        leading: IconButton(
+        leading: widget.showBottomNav ? IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const DonorDashboard()),
-            );
+            if (isDonor) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const DonorDashboard()),
+              );
+            } else {
+              Navigator.pop(context);
+            }
           },
-        ),
+        ) : null, // Hide back button if embedded in dashboard
+        automaticallyImplyLeading: false,
       ),
       body: _isLoading 
           ? const Center(child: CircularProgressIndicator())
@@ -84,40 +101,44 @@ class _ImpactScreenState extends State<ImpactScreen> {
                 child: Column(
                   children: [
                     // Total Impact Section
-                    _buildTotalImpactSection(),
+                    _buildTotalImpactSection(primaryColor, lightColor, shadowColor, isDonor),
 
                     const SizedBox(height: 32),
 
                     // Achievements Section
-                    _buildAchievementsSection(),
+                    _buildAchievementsSection(isDonor),
                   ],
                 ),
               ),
             ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      bottomNavigationBar: widget.showBottomNav ? _buildBottomNavigationBar() : null,
     );
   }
 
-  Widget _buildTotalImpactSection() {
+  Widget _buildTotalImpactSection(Color primary, Color light, Color shadow, bool isDonor) {
     // Extract data with defaults
     final foodSaved = _impactData['foodSaved'] ?? '0kg';
     final estimatedMeals = _impactData['estimatedMeals']?.toString() ?? '0';
     final totalDonations = _impactData['totalDonations']?.toString() ?? '0';
     final peopleHelped = _impactData['peopleHelped']?.toString() ?? '0';
 
+    // Receiver specific metrics if available
+    final foodCollected = _impactData['foodCollected'] ?? foodSaved; // Fallback
+    final pickupsDone = _impactData['pickupsDone']?.toString() ?? totalDonations; // Fallback
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2E7D32), Color(0xFF4CAF50)],
+          colors: [primary, light],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.shade200,
+            color: shadow,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -125,9 +146,9 @@ class _ImpactScreenState extends State<ImpactScreen> {
       ),
       child: Column(
         children: [
-          const Text(
-            'Your Total Impact',
-            style: TextStyle(
+          Text(
+            isDonor ? 'Your Total Impact' : 'Total Impact This Month',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -139,17 +160,33 @@ class _ImpactScreenState extends State<ImpactScreen> {
           // Stats Grid
           Row(
             children: [
-              Expanded(child: _buildImpactStat(foodSaved, 'Food Donated', Icons.restaurant)),
+              Expanded(child: _buildImpactStat(
+                isDonor ? foodSaved : foodCollected, 
+                isDonor ? 'Food Donated' : 'Food Collected', 
+                Icons.restaurant
+              )),
               const SizedBox(width: 16),
-              Expanded(child: _buildImpactStat(estimatedMeals, 'Meals Served', Icons.people)),
+              Expanded(child: _buildImpactStat(
+                estimatedMeals, 
+                'Meals Served', 
+                Icons.people
+              )),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildImpactStat(totalDonations, 'Donations', Icons.redeem)),
+              Expanded(child: _buildImpactStat(
+                isDonor ? totalDonations : pickupsDone, 
+                isDonor ? 'Donations' : 'Pickups Done', 
+                isDonor ? Icons.redeem : Icons.local_shipping
+              )),
               const SizedBox(width: 16),
-              Expanded(child: _buildImpactStat(peopleHelped, 'People Helped', Icons.handshake)),
+              Expanded(child: _buildImpactStat(
+                peopleHelped, 
+                isDonor ? 'People Helped' : 'Partnered', 
+                Icons.handshake
+              )),
             ],
           ),
         ],
@@ -192,7 +229,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
     );
   }
 
-  Widget _buildAchievementsSection() {
+  Widget _buildAchievementsSection(bool isDonor) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -216,15 +253,15 @@ class _ImpactScreenState extends State<ImpactScreen> {
           const SizedBox(height: 16),
 
           // Achievement Card
-          _buildAchievementCard(),
+          _buildAchievementCard(isDonor),
           const SizedBox(height: 12),
-          _buildAchievementCard2(),
+          _buildAchievementCard2(isDonor),
         ],
       ),
     );
   }
 
-  Widget _buildAchievementCard() {
+  Widget _buildAchievementCard(bool isDonor) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -241,7 +278,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Top Donor This Month',
+                  isDonor ? 'Top Donor This Month' : 'Most Active NGO',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -251,7 +288,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "You're in the top 10% of donors in your area!",
+                  isDonor ? "You're in the top 10% of donors in your area!" : "Ranked #1 in your area this month!",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.amber.shade700,
@@ -266,7 +303,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
     );
   }
 
-  Widget _buildAchievementCard2() {
+  Widget _buildAchievementCard2(bool isDonor) {
     // Dynamic text based on actual impact if available, otherwise generic
     final foodSaved = _impactData['foodSaved'] ?? '480kg';
     
@@ -279,27 +316,27 @@ class _ImpactScreenState extends State<ImpactScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.eco, color: Colors.blue.shade700, size: 32),
+          Icon(isDonor ? Icons.eco : Icons.star, color: isDonor ? Colors.blue.shade700 : Colors.yellow.shade700, size: 32),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Environmental Champion',
+                  isDonor ? 'Environmental Champion' : '5.0 Rating',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade800,
+                    color: isDonor ? Colors.blue.shade800 : Colors.yellow.shade800,
                     fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Saved $foodSaved of food from waste!',
+                  isDonor ? 'Saved $foodSaved of food from waste!' : 'Perfect rating from all donors',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.blue.shade700,
+                    color: isDonor ? Colors.blue.shade700 : Colors.yellow.shade700,
                     fontFamily: 'Poppins',
                   ),
                 ),

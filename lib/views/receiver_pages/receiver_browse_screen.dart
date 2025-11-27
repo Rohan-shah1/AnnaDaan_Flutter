@@ -79,7 +79,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
         // Dark Blue Header Section
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+          padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 24),
           decoration: const BoxDecoration(
             color: Color(0xFF1565C0),
             borderRadius: BorderRadius.only(
@@ -102,10 +102,10 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Welcome Back',
+                              'Welcome Back,',
                               style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontFamily: 'Poppins',
                               ),
                             ),
@@ -123,11 +123,38 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.account_circle, color: Colors.white, size: 32),
-                        onPressed: () {
-                          // Navigate to profile will be handled by parent
-                        },
+                      Row(
+                        children: [
+                          // Notification Bell
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.notifications_outlined,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/notifications');
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Profile Picture
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: Colors.white,
+                            backgroundImage: apiService.userProfile?['profilePicture'] != null
+                                ? NetworkImage('${ApiService.baseUrl}/api/upload/${apiService.userProfile!['profilePicture']}')
+                                : null,
+                            child: apiService.userProfile?['profilePicture'] == null
+                                ? const Icon(Icons.person, color: Color(0xFF1565C0))
+                                : null,
+                          ),
+                        ],
                       ),
                     ],
                   );
@@ -289,9 +316,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -301,75 +327,28 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      donation['foodDescription'] ?? 'Food Donation',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${donation['foodType']} • ${donation['dietaryInformation'] ?? 'N/A'}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                  ],
+              Text(
+                donation['foodDescription'] ?? 'Food Donation',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF81C784),
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xFFE3F2FD),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'AVAILABLE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
+                child: Text(
+                  donation['foodType'] ?? 'N/A',
+                  style: const TextStyle(
+                    color: Color(0xFF1565C0),
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Poppins',
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Icon(Icons.scale, size: 16, color: Colors.grey),
-              const SizedBox(width: 6),
-              Text(
-                donation['quantity'] ?? 'N/A',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                  fontFamily: 'Poppins',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16, color: Colors.grey),
-              const SizedBox(width: 6),
-              Text(
-                'Expires: ${donation['expiryDate'] ?? 'N/A'}',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                  fontFamily: 'Poppins',
                 ),
               ),
             ],
@@ -378,188 +357,56 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
           Row(
             children: [
               const Icon(Icons.location_on, size: 16, color: Colors.grey),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  donation['location']?['address'] ?? 'N/A',
+                  donation['location']?['address'] ?? 'Unknown Location',
                   style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[700],
+                    color: Colors.grey[600],
+                    fontSize: 14,
                     fontFamily: 'Poppins',
                   ),
-                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 4),
           Row(
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    _showDonationDetails(donation);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF1565C0)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'View Details',
-                    style: TextStyle(
-                      color: Color(0xFF1565C0),
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    _reservePickup(donation);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1565C0),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Reserve Pickup',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              const Icon(Icons.access_time, size: 16, color: Colors.grey),
+              const SizedBox(width: 4),
+              Text(
+                'Pickup by: ${donation['pickupWindow']?['end'] ?? 'N/A'}',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
                 ),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  void _showDonationDetails(dynamic donation) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      donation['foodDescription'] ?? 'Food Donation',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildDetailRow(Icons.restaurant, 'Food Type', donation['foodType']),
-                    _buildDetailRow(Icons.scale, 'Quantity', donation['quantity']),
-                    _buildDetailRow(Icons.calendar_today, 'Expiry Date', donation['expiryDate']),
-                    _buildDetailRow(Icons.local_dining, 'Dietary Info', donation['dietaryInformation']),
-                    _buildDetailRow(Icons.location_on, 'Location', donation['location']?['address']),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFF1565C0)),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _reservePickup(donation);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1565C0),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: const Text('Reserve', style: TextStyle(fontFamily: 'Poppins')),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // Reserve functionality
+                _showReserveDialog(donation);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1565C0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String label, dynamic value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: const Color(0xFF1565C0)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontFamily: 'Poppins',
-                  ),
+              child: const Text(
+                'Reserve',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  value?.toString() ?? 'N/A',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -567,43 +414,33 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     );
   }
 
-  void _reservePickup(dynamic donation) {
+  void _showReserveDialog(dynamic donation) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          'Reserve Pickup',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('Confirm Reservation', style: TextStyle(fontFamily: 'Poppins')),
         content: Text(
-          'Are you sure you want to reserve ${donation['foodDescription']}?',
+          'Do you want to reserve ${donation['foodDescription']}?',
           style: const TextStyle(fontFamily: 'Poppins'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(fontFamily: 'Poppins')),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              
               // Call API to reserve
               try {
                 final apiService = Provider.of<ApiService>(context, listen: false);
                 final result = await apiService.createReservation(donation['_id']);
+                
                 if (result['success']) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Successfully reserved ${donation['foodDescription']}',
-                          style: const TextStyle(fontFamily: 'Poppins'),
-                      ),
+                    const SnackBar(
+                      content: Text('Donation reserved successfully!'),
                       backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                   // Refresh list
@@ -611,32 +448,22 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                          'Reservation failed: ${result['message']}',
-                          style: const TextStyle(fontFamily: 'Poppins'),
-                      ),
+                      content: Text(result['message'] ?? 'Failed to reserve'),
                       backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                      'Error: $e',
-                      style: const TextStyle(fontFamily: 'Poppins'),
-                    ),
+                    content: Text('Error: $e'),
                     backgroundColor: Colors.red,
-                    behavior: SnackBarBehavior.floating,
                   ),
                 );
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1565C0),
-            ),
-            child: const Text('Confirm', style: TextStyle(fontFamily: 'Poppins')),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1565C0)),
+            child: const Text('Confirm'),
           ),
         ],
       ),

@@ -8,7 +8,9 @@ import 'about_screen.dart';
 import '../donor_pages/donor_dashboard.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool showBottomNav;
+  
+  const ProfileScreen({super.key, this.showBottomNav = true});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -45,14 +47,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: Colors.white,
-        body: Center(child: CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Profile',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -62,31 +64,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+        iconTheme: const IconThemeData(color: Colors.black87),
+        leading: widget.showBottomNav ? IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => DonorDashboard()),
+              MaterialPageRoute(builder: (context) => const DonorDashboard()),
             );
           },
-        ),
+        ) : null,
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             // Profile Header
             _buildProfileHeader(),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             // Menu Items
             _buildMenuItems(),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      bottomNavigationBar: widget.showBottomNav ? _buildBottomNavigationBar() : null,
     );
   }
 
@@ -96,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userType = _userProfile?['userType'] ?? 'donor';
     
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
@@ -107,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Profile Picture
           CircleAvatar(
             radius: 40,
-            backgroundColor: Color(0xFF2E7D32),
+            backgroundColor: const Color(0xFF2E7D32),
             backgroundImage: _userProfile?['profilePicture'] != null
                 ? NetworkImage('${ApiService.baseUrl}/api/upload/${_userProfile!['profilePicture']}')
                 : null,
@@ -119,19 +122,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   )
                 : null,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // User/Organization Name
           Text(
             name,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
               fontFamily: 'Poppins',
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
 
           // Email
           Text(
@@ -142,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontFamily: 'Poppins',
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Verification Badge - Dynamic based on status
           _buildVerificationBadge(userType),
@@ -164,22 +167,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'approved':
       case 'verified':
         // Verified status - green
-        badgeColor = Color(0xFF2E7D32);
-        backgroundColor = Color(0xFFE8F5E9);
+        badgeColor = const Color(0xFF2E7D32);
+        backgroundColor = const Color(0xFFE8F5E9);
         icon = Icons.verified;
         text = 'Verified ${userType == 'donor' ? 'Donor' : 'Receiver'}';
         break;
       case 'pending':
         // Pending status - orange/amber
-        badgeColor = Color(0xFFF57C00);
-        backgroundColor = Color(0xFFFFF3E0);
+        badgeColor = const Color(0xFFF57C00);
+        backgroundColor = const Color(0xFFFFF3E0);
         icon = Icons.hourglass_empty;
         text = 'Verification Pending';
         break;
       case 'rejected':
         // Rejected status - red
-        badgeColor = Color(0xFFD32F2F);
-        backgroundColor = Color(0xFFFFEBEE);
+        badgeColor = const Color(0xFFD32F2F);
+        backgroundColor = const Color(0xFFFFEBEE);
         icon = Icons.cancel;
         text = 'Verification Required';
         break;
@@ -192,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
@@ -205,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: badgeColor,
             size: 16,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             text,
             style: TextStyle(
@@ -226,11 +229,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _buildMenuItem(
           Icons.edit,
           'Edit Profile',
-          Colors.green,
+          Colors.grey.shade700,
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditProfileScreen()),
+              MaterialPageRoute(builder: (context) => const EditProfileScreen()),
             );
           },
         ),
@@ -241,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingsScreen()),
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
             );
           },
         ),
@@ -252,7 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HelpSupportScreen()),
+              MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
             );
           },
         ),
@@ -263,11 +266,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AboutScreen()),
+              MaterialPageRoute(builder: (context) => const AboutScreen()),
             );
           },
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildMenuItem(
           Icons.logout,
           'Logout',
@@ -277,16 +280,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             final shouldLogout = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: Text('Logout', style: TextStyle(fontFamily: 'Poppins')),
-                content: Text('Are you sure you want to logout?', style: TextStyle(fontFamily: 'Poppins')),
+                title: const Text('Logout', style: TextStyle(fontFamily: 'Poppins')),
+                content: const Text('Are you sure you want to logout?', style: TextStyle(fontFamily: 'Poppins')),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text('Cancel'),
+                    child: const Text('Cancel'),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: Text('Logout', style: TextStyle(color: Colors.red)),
+                    child: const Text('Logout', style: TextStyle(color: Colors.red)),
                   ),
                 ],
               ),
@@ -307,8 +310,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 12),
-        padding: EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -317,7 +320,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           children: [
             Icon(icon, color: color, size: 24),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
@@ -338,7 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         boxShadow: [
           BoxShadow(
             color: Color(0x33AAAAAA),
@@ -352,11 +355,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => _handleNavigation(index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
+        selectedItemColor: const Color(0xFF2E7D32),
         unselectedItemColor: Colors.grey,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
           BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),

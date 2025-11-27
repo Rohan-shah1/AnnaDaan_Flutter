@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/api_service.dart';
 import '../../services/google_signin_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -339,13 +340,17 @@ class _LoginPageState extends State<LoginScreen> {
     }
   }
 
-  void _navigateAfterLogin(ApiService apiService) {
+
+
+  Future<void> _navigateAfterLogin(ApiService apiService) async {
     if (apiService.userProfile != null &&
         apiService.userProfile!['profileCompleted'] == true) {
 
       if (apiService.userProfile!['userType'] == 'donor') {
         Navigator.pushReplacementNamed(context, '/donor-dashboard');
       } else if (apiService.userProfile!['userType'] == 'receiver') {
+        // Fetch location for receivers
+        await _fetchAndSetLocation(apiService);
         Navigator.pushReplacementNamed(context, '/receiver-dashboard');
       } else {
         // userType is neither donor nor receiver
@@ -355,6 +360,42 @@ class _LoginPageState extends State<LoginScreen> {
     } else {
       // profileCompleted == false OR userProfile == null
       Navigator.pushReplacementNamed(context, '/role-selection');
+    }
+  }
+
+  Future<void> _fetchAndSetLocation(ApiService apiService) async {
+    try {
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      // Test if location services are enabled.
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print('Location services are disabled.');
+        return;
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          print('Location permissions are denied');
+          return;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        print('Location permissions are permanently denied, we cannot request permissions.');
+        return;
+      } 
+
+      // When we reach here, permissions are granted and we can
+      // continue accessing the position of the device.
+      Position position = await Geolocator.getCurrentPosition();
+      apiService.setCurrentLocation(position.latitude, position.longitude);
+      
+    } catch (e) {
+      print('Error fetching location: $e');
     }
   }
 

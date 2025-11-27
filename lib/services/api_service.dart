@@ -26,6 +26,16 @@ class ApiService with ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get isInitialized => _isInitialized;
 
+  // Location
+  Map<String, double>? _currentLocation;
+  Map<String, double>? get currentLocation => _currentLocation;
+
+  void setCurrentLocation(double lat, double lng) {
+    _currentLocation = {'lat': lat, 'lng': lng};
+    notifyListeners();
+    print('📍 Location updated in ApiService: $_currentLocation');
+  }
+
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -384,6 +394,10 @@ class ApiService with ChangeNotifier {
   // Get Nearby Donations (Receiver)
   Future<List<dynamic>> getNearbyDonations({double? lat, double? lng, double? maxDistance}) async {
     try {
+      // Use stored location if not provided
+      lat ??= _currentLocation?['lat'];
+      lng ??= _currentLocation?['lng'];
+
       String url = '$baseUrl/api/donations/nearby/available';
       List<String> queryParams = [];
       

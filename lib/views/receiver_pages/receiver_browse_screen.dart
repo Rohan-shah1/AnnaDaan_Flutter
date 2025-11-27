@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
+
 class ReceiverBrowseScreen extends StatefulWidget {
   const ReceiverBrowseScreen({super.key});
+
   @override
   _ReceiverBrowseScreenState createState() => _ReceiverBrowseScreenState();
 }
+
 class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
-  String _selectedCategory = 'All';
+  String _selectedCategory = 'Nearby'; // Default to Nearby
+  
   final List<String> _categories = [
+    'Nearby',
     'All',
     'Cooked Meals',
     'Vegetables',
@@ -16,33 +21,59 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     'Bakery',
     'Dairy'
   ];
+
   List<dynamic> _allDonations = [];
+  List<dynamic> _nearbyDonations = [];
   bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     _fetchDonations();
   }
+
   Future<void> _fetchDonations() async {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
-      final donations = await apiService.getNearbyDonations();
-      setState(() {
-        _allDonations = donations;
-        _isLoading = false;
-      });
+      
+      // Fetch nearby donations (10km radius)
+      final nearby = await apiService.getNearbyDonations(maxDistance: 10000);
+      
+      // Fetch all donations (no distance limit)
+      final all = await apiService.getNearbyDonations();
+
+      if (mounted) {
+        setState(() {
+          _nearbyDonations = nearby;
+          _allDonations = all;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       print('Error fetching donations: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    final filteredDonations = _selectedCategory == 'All'
-        ? _allDonations
-        : _allDonations.where((donation) => donation['category'] == _selectedCategory).toList();
+    // Filter logic
+    List<dynamic> filteredDonations;
+    if (_selectedCategory == 'Nearby') {
+      filteredDonations = _nearbyDonations;
+    } else if (_selectedCategory == 'All') {
+      filteredDonations = _allDonations;
+    } else {
+      filteredDonations = _allDonations.where((donation) => 
+        donation['category'] == _selectedCategory || 
+        donation['foodType'] == _selectedCategory
+      ).toList();
+    }
+
     return Column(
       children: [
         // Dark Blue Header Section
@@ -107,7 +138,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildStatCard('${_allDonations.length}', 'Available', const Color(0xFF1976D2)),
+                  _buildStatCard('${filteredDonations.length}', 'Available', const Color(0xFF1976D2)),
                   _buildStatCard('0', 'Reserved', const Color(0xFF1976D2)),
                   _buildStatCard('0', 'Completed', const Color(0xFF1976D2)),
                 ],
@@ -164,10 +195,14 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Available Nearby Section
-                const Text(
-                  'Available Nearby',
-                  style: TextStyle(
+                // Dynamic Heading
+                Text(
+                  _selectedCategory == 'Nearby' 
+                    ? 'Nearby Donations (within 10km)'
+                    : _selectedCategory == 'All'
+                      ? 'All Available Donations'
+                      : '$_selectedCategory Donations',
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -179,7 +214,20 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (filteredDonations.isEmpty)
-                  const Center(child: Text('No donations available nearby.'))
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Text(
+                        _selectedCategory == 'Nearby'
+                          ? 'No donations found within 10km.'
+                          : 'No donations available in this category.',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                  )
                 else
                   ...filteredDonations.map((donation) {
                     return Padding(
@@ -194,6 +242,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ],
     );
   }
+
   Widget _buildStatCard(String value, String label, Color color) {
     return Expanded(
       child: Container(
@@ -229,6 +278,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ),
     );
   }
+
   Widget _buildDonationCard(dynamic donation) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -395,6 +445,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ),
     );
   }
+
   void _showDonationDetails(dynamic donation) {
     showModalBottomSheet(
       context: context,
@@ -478,6 +529,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ),
     );
   }
+
   Widget _buildDetailRow(IconData icon, String label, dynamic value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -514,6 +566,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ),
     );
   }
+
   void _reservePickup(dynamic donation) {
     showDialog(
       context: context,

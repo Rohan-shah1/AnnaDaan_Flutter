@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
-
 class ReceiverBrowseScreen extends StatefulWidget {
   const ReceiverBrowseScreen({super.key});
-
   @override
   _ReceiverBrowseScreenState createState() => _ReceiverBrowseScreenState();
 }
-
 class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
-  String _selectedCategory = 'All (12)';
-
+  String _selectedCategory = 'All';
   final List<String> _categories = [
-    'All (12)',
-    'Cooked Meals (3)',
-    'Vegetables (6)',
-    'Fruits (9)',
-    'Bakery (12)',
-    'Dairy (15)'
+    'All',
+    'Cooked Meals',
+    'Vegetables',
+    'Fruits',
+    'Bakery',
+    'Dairy'
   ];
-
   List<dynamic> _allDonations = [];
   bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
     _fetchDonations();
   }
-
   Future<void> _fetchDonations() async {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
-      final donations = await apiService.getNearbyDonations(); // Add lat/lng if available
+      final donations = await apiService.getNearbyDonations();
       setState(() {
         _allDonations = donations;
         _isLoading = false;
@@ -46,13 +38,11 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    final filteredDonations = _selectedCategory == 'All (12)'
+    final filteredDonations = _selectedCategory == 'All'
         ? _allDonations
         : _allDonations.where((donation) => donation['category'] == _selectedCategory).toList();
-
     return Column(
       children: [
         // Dark Blue Header Section
@@ -69,54 +59,62 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              Consumer<ApiService>(
+                builder: (context, apiService, child) {
+                  final organizationName = apiService.userProfile?['organizationName'] ?? 'Receiver';
+                  
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Welcome Back',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Welcome Back',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              organizationName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins',
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Hope Foundation',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.account_circle, color: Colors.white, size: 32),
+                        onPressed: () {
+                          // Navigate to profile will be handled by parent
+                        },
                       ),
                     ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.account_circle, color: Colors.white, size: 32),
-                    onPressed: () {
-                      // Navigate to profile will be handled by parent
-                    },
-                  ),
-                ],
+                  );
+                },
               ),
               const SizedBox(height: 20),
               // Stats Cards
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildStatCard('12', 'Available', const Color(0xFF1976D2)),
-                  _buildStatCard('3', 'Reserved', const Color(0xFF1976D2)),
-                  _buildStatCard('58', 'Completed', const Color(0xFF1976D2)),
+                  _buildStatCard('${_allDonations.length}', 'Available', const Color(0xFF1976D2)),
+                  _buildStatCard('0', 'Reserved', const Color(0xFF1976D2)),
+                  _buildStatCard('0', 'Completed', const Color(0xFF1976D2)),
                 ],
               ),
             ],
           ),
         ),
-
         // Content Section
         Expanded(
           child: SingleChildScrollView(
@@ -166,7 +164,6 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 // Available Nearby Section
                 const Text(
                   'Available Nearby',
@@ -178,7 +175,6 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 // Donation List
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
@@ -198,7 +194,6 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ],
     );
   }
-
   Widget _buildStatCard(String value, String label, Color color) {
     return Expanded(
       child: Container(
@@ -234,7 +229,6 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ),
     );
   }
-
   Widget _buildDonationCard(dynamic donation) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -321,11 +315,30 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
               const Icon(Icons.access_time, size: 16, color: Colors.grey),
               const SizedBox(width: 6),
               Text(
-                'Ready: ${donation['readyBy']}',
+                'Expires: ${donation['expiryDate'] ?? 'N/A'}',
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.grey[700],
                   fontFamily: 'Poppins',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.location_on, size: 16, color: Colors.grey),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  donation['location']?['address'] ?? 'N/A',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[700],
+                    fontFamily: 'Poppins',
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -339,7 +352,6 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                     _showDonationDetails(donation);
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                     side: const BorderSide(color: Color(0xFF1565C0)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -349,9 +361,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                     'View Details',
                     style: TextStyle(
                       color: Color(0xFF1565C0),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
                       fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -360,12 +371,11 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    _reserveDonation(donation);
+                    _reservePickup(donation);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1565C0),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -373,10 +383,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   child: const Text(
                     'Reserve Pickup',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
                       fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -387,55 +395,126 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       ),
     );
   }
-
   void _showDonationDetails(dynamic donation) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          donation['foodDescription'] ?? 'Donation Details',
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
         ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Quantity: ${donation['quantity']}', style: const TextStyle(fontFamily: 'Poppins')),
-              Text('Ready By: ${donation['readyBy']}', style: const TextStyle(fontFamily: 'Poppins')),
-              Text('Pickup Window End: ${donation['pickupWindowEnd']}', style: const TextStyle(fontFamily: 'Poppins')),
-              const SizedBox(height: 8),
-              Text(
-                'Additional Notes: ${donation['additionalNotes'] ?? 'None'}',
-                style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.grey[600]),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _reserveDonation(donation);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1565C0),
             ),
-            child: const Text('Reserve Now', style: TextStyle(fontFamily: 'Poppins')),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      donation['foodDescription'] ?? 'Food Donation',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildDetailRow(Icons.restaurant, 'Food Type', donation['foodType']),
+                    _buildDetailRow(Icons.scale, 'Quantity', donation['quantity']),
+                    _buildDetailRow(Icons.calendar_today, 'Expiry Date', donation['expiryDate']),
+                    _buildDetailRow(Icons.local_dining, 'Dietary Info', donation['dietaryInformation']),
+                    _buildDetailRow(Icons.location_on, 'Location', donation['location']?['address']),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF1565C0)),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _reservePickup(donation);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1565C0),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Text('Reserve', style: TextStyle(fontFamily: 'Poppins')),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildDetailRow(IconData icon, String label, dynamic value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFF1565C0)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value?.toString() ?? 'N/A',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
-
-  void _reserveDonation(dynamic donation) {
+  void _reservePickup(dynamic donation) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -462,14 +541,13 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
               // Call API to reserve
               try {
                 final apiService = Provider.of<ApiService>(context, listen: false);
-                final result = await apiService.createReservation(donation['_id']); // Assuming backend returns _id
-
+                final result = await apiService.createReservation(donation['_id']);
                 if (result['success']) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Successfully reserved ${donation['foodDescription']}',
-                        style: const TextStyle(fontFamily: 'Poppins'),
+                          'Successfully reserved ${donation['foodDescription']}',
+                          style: const TextStyle(fontFamily: 'Poppins'),
                       ),
                       backgroundColor: Colors.green,
                       behavior: SnackBarBehavior.floating,
@@ -481,8 +559,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Reservation failed: ${result['message']}',
-                        style: const TextStyle(fontFamily: 'Poppins'),
+                          'Reservation failed: ${result['message']}',
+                          style: const TextStyle(fontFamily: 'Poppins'),
                       ),
                       backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,

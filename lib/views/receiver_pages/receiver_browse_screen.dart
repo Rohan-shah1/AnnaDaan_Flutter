@@ -35,30 +35,11 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
       
-      // Get current location
-      Position? position;
-      try {
-        position = await _determinePosition();
-      } catch (e) {
-        print('Error getting location: $e');
-      }
-
-      // Fetch nearby donations (10km radius) if location available
-      List<dynamic> nearby = [];
-      if (position != null) {
-        nearby = await apiService.getNearbyDonations(
-          lat: position.latitude, 
-          lng: position.longitude,
-          maxDistance: 10
-        );
-      }
-      
-      // Fetch all donations (using search endpoint)
+      // Only fetch all donations on initial load (no location needed)
       final all = await apiService.searchDonations();
 
       if (mounted) {
         setState(() {
-          _nearbyDonations = nearby;
           _allDonations = all;
           _isLoading = false;
         });
@@ -68,6 +49,47 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchNearbyDonations() async {
+    try {
+      final apiService = Provider.of<ApiService>(context, listen: false);
+      
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Get current location
+      Position position = await _determinePosition();
+
+      // Fetch nearby donations (10km radius)
+      final nearby = await apiService.getNearbyDonations(
+        lat: position.latitude, 
+        lng: position.longitude,
+        maxDistance: 10
+      );
+
+      if (mounted) {
+        setState(() {
+          _nearbyDonations = nearby;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching nearby donations: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission is required for nearby donations'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+          _selectedCategory = 'All'; // Switch back to All
         });
       }
     }
@@ -238,6 +260,10 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                       final isSelected = category == _selectedCategory;
                       return GestureDetector(
                         onTap: () {
+                          if (category == 'Nearby' && _nearbyDonations.isEmpty) {
+                            // Fetch nearby donations when Nearby is clicked for the first time
+                            _fetchNearbyDonations();
+                          }
                           setState(() {
                             _selectedCategory = category;
                           });

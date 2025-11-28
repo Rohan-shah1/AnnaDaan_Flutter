@@ -8,7 +8,6 @@ class HelpSupportScreen extends StatefulWidget {
 }
 
 class _HelpSupportScreenState extends State<HelpSupportScreen> {
-  int _currentIndex = 3;
   final List<FAQItem> _faqs = [
     FAQItem(
       question: 'How do I post a donation?',
@@ -33,7 +32,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Help & Support',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -43,23 +42,22 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // FAQ Section
             _buildFAQSection(),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             // Contact Support Section
             _buildContactSupport(),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -67,7 +65,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Frequently Asked Questions',
           style: TextStyle(
             fontSize: 20,
@@ -76,7 +74,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             fontFamily: 'Poppins',
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ..._faqs.map((faq) => _buildFAQItem(faq)).toList(),
       ],
     );
@@ -84,12 +82,12 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
   Widget _buildFAQItem(FAQItem faq) {
     return Card(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
       child: ExpansionTile(
         title: Text(
           faq.question,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -98,7 +96,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
         ),
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Text(
               faq.answer,
               style: TextStyle(
@@ -110,7 +108,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             ),
           ),
         ],
-        tilePadding: EdgeInsets.symmetric(horizontal: 16),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 16),
       ),
     );
   }
@@ -119,7 +117,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Contact Support',
           style: TextStyle(
             fontSize: 20,
@@ -128,7 +126,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             fontFamily: 'Poppins',
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
 
         // Email Support
         _buildContactCard(
@@ -138,13 +136,13 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           onTap: () {
             // TODO: Implement email
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Opening email app...', style: TextStyle(fontFamily: 'Poppins')),
               ),
             );
           },
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
 
         // Phone Support
         _buildContactCard(
@@ -154,13 +152,13 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           onTap: () {
             // TODO: Implement phone call
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Calling support...', style: TextStyle(fontFamily: 'Poppins')),
               ),
             );
           },
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
 
         // Live Chat
         _buildContactCard(
@@ -169,7 +167,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           subtitle: 'Available 9 AM - 6 PM',
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Live chat coming soon!', style: TextStyle(fontFamily: 'Poppins')),
               ),
             );
@@ -190,8 +188,8 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
       color: Colors.grey.shade50,
       child: ListTile(
         leading: Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.all(12),
+          decoration: const BoxDecoration(
             color: Color(0xFF2E7D32),
             shape: BoxShape.circle,
           ),
@@ -199,7 +197,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
         ),
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -218,53 +216,6 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
         onTap: onTap,
       ),
     );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x33AAAAAA),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => _handleNavigation(index),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
-          BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
-  void _handleNavigation(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/donor-dashboard');
-        break;
-      case 1:
-        Navigator.pushReplacementNamed(context, '/active-donations');
-        break;
-      case 2:
-        Navigator.pushReplacementNamed(context, '/impact-screen');
-        break;
-      case 3:
-        Navigator.pushReplacementNamed(context, '/profile-screen');
-        break;
-    }
   }
 }
 

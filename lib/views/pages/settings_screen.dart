@@ -8,8 +8,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _currentIndex = 3;
-
   // Notification settings
   bool _pushNotifications = true;
   bool _emailNotifications = true;
@@ -24,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Settings',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -34,38 +32,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Notifications Section
             _buildSectionHeader('Notifications'),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildNotificationSettings(),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             // Preferences Section
             _buildSectionHeader('Preferences'),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildPreferenceSettings(),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             // App Version
             _buildAppVersion(),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
@@ -79,7 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       elevation: 0,
       color: Colors.grey.shade50,
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildSettingSwitch(
@@ -92,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            Divider(height: 24),
+            const Divider(height: 24),
             _buildSettingSwitch(
               title: 'Email Notifications',
               subtitle: 'Get email updates about your donation activities',
@@ -103,7 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            Divider(height: 24),
+            const Divider(height: 24),
             _buildSettingSwitch(
               title: 'SMS Alerts',
               subtitle: 'Receive text messages for urgent updates',
@@ -125,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       elevation: 0,
       color: Colors.grey.shade50,
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _buildSettingSwitch(
@@ -138,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
-            Divider(height: 24),
+            const Divider(height: 24),
             _buildSettingSwitch(
               title: 'Allow Quantity Splitting',
               subtitle: 'Allow NGOs to request partial quantities of your donations',
@@ -169,14 +166,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                   fontFamily: 'Poppins',
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 subtitle,
                 style: TextStyle(
@@ -191,7 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Color(0xFF2E7D32),
+          activeColor: const Color(0xFF2E7D32),
         ),
       ],
     );
@@ -208,52 +205,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x33AAAAAA),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => _handleNavigation(index),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF2E7D32),
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'Active'),
-          BottomNavigationBarItem(icon: Icon(Icons.track_changes), label: 'Impact'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
-  void _handleNavigation(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/donor-dashboard');
-        break;
-      case 1:
-        Navigator.pushReplacementNamed(context, '/active-donations');
-        break;
-      case 2:
-        Navigator.pushReplacementNamed(context, '/impact-screen');
-        break;
-      case 3:
-        Navigator.pushReplacementNamed(context, '/profile-screen');
-        break;
-    }
   }
 }

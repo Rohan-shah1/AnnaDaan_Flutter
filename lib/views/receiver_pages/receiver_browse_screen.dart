@@ -478,6 +478,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -536,7 +537,14 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1565C0)),
-            child: const Text('Confirm'),
+            child: const Text(
+              'Confirm',
+              style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              ),
+            ),
           ),
         ],
       ),

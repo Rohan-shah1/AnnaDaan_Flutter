@@ -42,9 +42,14 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
   }
 
   List<Map<String, dynamic>> get _filteredDonations {
-    if (_selectedCategory == 'All') return _donations;
+    // First filter out completed/picked_up donations
+    var activeDonations = _donations.where((d) => 
+      d['status'] != 'completed' && d['status'] != 'picked_up'
+    ).toList();
     
-    return _donations.where((donation) {
+    if (_selectedCategory == 'All') return activeDonations;
+    
+    return activeDonations.where((donation) {
       final foodType = donation['foodType']?.toString().toLowerCase() ?? '';
       switch (_selectedCategory) {
         case 'Cooked Meals':
@@ -468,6 +473,28 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
 
   Widget _buildActionButtons(Map<String, dynamic> donation) {
     final status = donation['status']?.toString().toLowerCase() ?? '';
+    
+    // If completed/picked_up, show button to view in history
+    if (status == 'completed' || status == 'picked_up') {
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pushNamed(context, '/donation-history');
+          },
+          icon: const Icon(Icons.history, size: 18),
+          label: const Text('View in History'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      );
+    }
     
     if (status == 'pending') {
       return Row(

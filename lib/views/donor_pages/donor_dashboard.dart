@@ -37,7 +37,12 @@ class _DonorDashboardState extends State<DonorDashboard> {
 
       if (mounted) {
         setState(() {
-          _recentDonations = (results[0] as List).take(5).toList();
+          // Filter out completed/picked_up donations - they should only appear in history
+          final allDonations = results[0] as List;
+          _recentDonations = allDonations
+              .where((d) => d['status'] != 'completed' && d['status'] != 'picked_up')
+              .take(5)
+              .toList();
           _stats = results[1] as Map<String, dynamic>;
           _isLoading = false;
         });

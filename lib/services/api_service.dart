@@ -679,6 +679,34 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  // Submit Rating
+  Future<Map<String, dynamic>> submitRating(String reservationId, int rating, {String? feedback}) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/api/reservations/$reservationId/rating'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+        body: json.encode({
+          'rating': rating,
+          'feedback': feedback ?? '',
+        }),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        notifyListeners();
+        return {'success': true, 'message': 'Rating submitted successfully', 'data': data};
+      } else {
+        return {'success': false, 'message': data['message'] ?? 'Rating submission failed'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
   // ----------------- NOTIFICATIONS -----------------
 
   // Get Notifications

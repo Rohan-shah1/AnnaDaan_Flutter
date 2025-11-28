@@ -5,17 +5,13 @@ import 'package:provider/provider.dart';
 import '../donor_pages/impact_screen.dart';
 import '../pages/profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 class ReceiverDashboard extends StatefulWidget {
   const ReceiverDashboard({super.key});
-
   @override
   _ReceiverDashboardState createState() => _ReceiverDashboardState();
 }
-
 class _ReceiverDashboardState extends State<ReceiverDashboard> {
   int _currentIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +20,6 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
-
   Widget _buildCurrentScreen() {
     switch (_currentIndex) {
       case 0:
@@ -39,7 +34,6 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
         return const ReceiverBrowseScreen();
     }
   }
-
   Widget _buildBottomNavigationBar() {
     return Container(
       decoration: BoxDecoration(
@@ -88,23 +82,19 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
     );
   }
 }
-
 // Reserved Screen
 class _ReceiverReservedScreen extends StatefulWidget {
   @override
   __ReceiverReservedScreenState createState() => __ReceiverReservedScreenState();
 }
-
 class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
   List<Map<String, dynamic>> _reservations = [];
   bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
     _fetchReservations();
   }
-
   Future<void> _fetchReservations() async {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
@@ -120,7 +110,6 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       });
     }
   }
-
   String _formatDistance(dynamic distance) {
     if (distance == null) return 'N/A';
     double dist = double.tryParse(distance.toString()) ?? 0.0;
@@ -129,7 +118,6 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
     }
     return '${dist.toStringAsFixed(1)} km';
   }
-
   Future<void> _openMap(double lat, double lng) async {
     final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -138,7 +126,6 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -147,10 +134,8 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-
     final activePickups = _reservations.where((item) => item['status'] == 'confirmed' || item['status'] == 'scheduled').toList();
     final completedPickups = _reservations.where((item) => item['status'] == 'picked_up' || item['status'] == 'completed').toList();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -192,7 +177,6 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
             // Active Pickups
             ...activePickups.map((pickup) {
               return Padding(
@@ -200,7 +184,6 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                 child: _buildReservedPickupCard(pickup),
               );
             }).toList(),
-
             // Completed Pickups
             if (completedPickups.isNotEmpty) ...[
               const SizedBox(height: 24),
@@ -225,14 +208,12 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       ),
     );
   }
-
   Widget _buildReservedPickupCard(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
     final location = donation['location'] ?? {};
     final coordinates = location['coordinates'] ?? {};
     final double? lat = coordinates['lat'] != null ? double.tryParse(coordinates['lat'].toString()) : null;
     final double? lng = coordinates['lng'] != null ? double.tryParse(coordinates['lng'].toString()) : null;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -379,9 +360,10 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       ),
     );
   }
-
   Widget _buildCompletedPickupCard(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
+    final rating = reservation['rating'];
+    final hasRating = rating != null;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -389,50 +371,93 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[200]!),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.check_circle, color: Colors.green),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.check_circle, color: Colors.green),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      donation['foodDescription'] ?? 'Food Donation',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Picked up on ${reservation['updatedAt']?.toString().split('T')[0] ?? 'Today'}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (hasRating) ...[
+            const SizedBox(height: 12),
+            Row(
               children: [
-                Text(
-                  donation['foodDescription'] ?? 'Food Donation',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Picked up on ${reservation['updatedAt']?.toString().split('T')[0] ?? 'Today'}',
+                const Text(
+                  'Your Rating: ',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'Poppins',
                   ),
                 ),
+                ...List.generate(5, (index) {
+                  return Icon(
+                    index < rating ? Icons.star : Icons.star_border,
+                    color: Colors.amber,
+                    size: 18,
+                  );
+                }),
               ],
             ),
-          ),
+          ] else ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showRatingDialog(reservation),
+                icon: const Icon(Icons.star_outline, size: 18),
+                label: const Text('Rate Donor'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: const BorderSide(color: Color(0xFF1565C0)),
+                  foregroundColor: const Color(0xFF1565C0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
-
   void _markAsPickedUp(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
     final foodDesc = donation['foodDescription'] ?? 'this donation';
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -446,14 +471,12 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-
               try {
                 final apiService = Provider.of<ApiService>(context, listen: false);
                 final result = await apiService.updateReservationStatus(
                   reservation['_id'],
                   'picked_up',
                 );
-
                 if (result['success']) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -476,6 +499,115 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
             child: const Text('Yes, Picked Up'),
           ),
         ],
+      ),
+    );
+  }
+  void _showRatingDialog(Map<String, dynamic> reservation) {
+    int selectedRating = 0;
+    final feedbackController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Rate Your Experience', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'How was your experience with this donor?',
+                    style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: Icon(
+                          index < selectedRating ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            selectedRating = index + 1;
+                          });
+                        },
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: feedbackController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Add feedback (optional)',
+                      hintStyle: const TextStyle(fontFamily: 'Poppins'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    style: const TextStyle(fontFamily: 'Poppins'),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel', style: TextStyle(fontFamily: 'Poppins')),
+              ),
+              ElevatedButton(
+                onPressed: selectedRating > 0
+                    ? () async {
+                        Navigator.pop(context);
+                        
+                        try {
+                          final apiService = Provider.of<ApiService>(context, listen: false);
+                          final result = await apiService.submitRating(
+                            reservation['_id'],
+                            selectedRating,
+                            feedback: feedbackController.text.trim(),
+                          );
+                          if (result['success']) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Thank you for your feedback!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            _fetchReservations();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(result['message'] ?? 'Failed to submit rating'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1565C0),
+                  disabledBackgroundColor: Colors.grey,
+                ),
+                child: const Text('Submit Rating', style: TextStyle(fontFamily: 'Poppins', color: Colors.white)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

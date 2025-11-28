@@ -30,9 +30,9 @@ import 'package:annadaan/views/pages/about_screen.dart';
 import 'package:annadaan/views/receiver_pages/receiver_browse_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
   runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    
     runApp(
       MultiProvider(
         providers: [

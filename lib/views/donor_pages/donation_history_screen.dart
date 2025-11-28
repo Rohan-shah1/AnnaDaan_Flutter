@@ -67,6 +67,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
     }).map((don) {
       // Map backend fields to UI fields
       return {
+        ...don,
         'title': don['foodDescription'] ?? 'Food Donation',
         'time': _formatDate(don['createdAt']),
         'organization': don['reservedBy']?['organizationName'] ?? 'Unknown Receiver',
@@ -75,7 +76,6 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
         'quantity': '${don['quantity']?['value']} ${don['quantity']?['unit']}',
         'status': don['status'],
         'id': don['_id'],
-        ...don,
       };
     }).toList();
   }

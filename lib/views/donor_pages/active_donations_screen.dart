@@ -429,8 +429,9 @@ class _ActiveDonationsScreenState extends State<ActiveDonationsScreen> {
         badgeText = 'POSTED';
         break;
       case 'reserved':
+      case 'confirmed':
         badgeColor = Colors.blue;
-        badgeText = 'RESERVED';
+        badgeText = 'PACK FOOD';
         break;
       case 'picked_up':
       case 'completed':

@@ -432,7 +432,11 @@ class _DonorDashboardState extends State<DonorDashboard> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    status.toLowerCase() == 'pending' ? 'POSTED' : status.toUpperCase(),
+                    status.toLowerCase() == 'pending' 
+                        ? 'POSTED' 
+                        : (status.toLowerCase() == 'reserved' || status.toLowerCase() == 'confirmed') 
+                            ? 'PACK FOOD' 
+                            : status.toUpperCase(),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,

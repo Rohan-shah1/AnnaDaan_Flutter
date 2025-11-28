@@ -489,9 +489,11 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
   }
 
   void _showReserveDialog(dynamic donation) {
+    final scaffoldContext = context; // Capture the screen's context
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Confirm Reservation', style: TextStyle(fontFamily: 'Poppins')),
         content: Text(
           'Do you want to reserve ${donation['foodDescription']}?',
@@ -499,19 +501,35 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               // Call API to reserve
               try {
-                final apiService = Provider.of<ApiService>(context, listen: false);
-                final result = await apiService.createReservation(donation['_id']);
+                final apiService = Provider.of<ApiService>(scaffoldContext, listen: false);
+                
+                // Use the donation's pickup window end time as scheduled pickup time
+                // If not available, use current time + 2 hours as default
+                String scheduledPickup;
+                if (donation['pickupWindow'] != null && donation['pickupWindow']['end'] != null) {
+                  scheduledPickup = donation['pickupWindow']['end'];
+                } else {
+                  // Default: 2 hours from now
+                  scheduledPickup = DateTime.now().add(Duration(hours: 2)).toIso8601String();
+                }
+                
+                final result = await apiService.createReservation(
+                  donation['_id'],
+                  scheduledPickup,
+                );
+                
+                if (!mounted) return;
                 
                 if (result['success']) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                     const SnackBar(
                       content: Text('Donation reserved successfully!'),
                       backgroundColor: Colors.green,
@@ -520,7 +538,7 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   // Refresh list
                   _fetchDonations();
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                     SnackBar(
                       content: Text(result['message'] ?? 'Failed to reserve'),
                       backgroundColor: Colors.red,
@@ -528,7 +546,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                   );
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                if (!mounted) return;
+                ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                   SnackBar(
                     content: Text('Error: $e'),
                     backgroundColor: Colors.red,

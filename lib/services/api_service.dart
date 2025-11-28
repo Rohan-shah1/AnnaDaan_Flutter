@@ -541,7 +541,7 @@ class ApiService with ChangeNotifier {
   // ----------------- RESERVATIONS -----------------
 
   // Create Reservation
-  Future<Map<String, dynamic>> createReservation(String donationId) async {
+  Future<Map<String, dynamic>> createReservation(String donationId, String scheduledPickup) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/api/reservations'),
@@ -549,7 +549,10 @@ class ApiService with ChangeNotifier {
           'Content-Type': 'application/json',
           if (_token != null) 'Authorization': 'Bearer $_token',
         },
-        body: json.encode({'donationId': donationId}),
+        body: json.encode({
+          'donationId': donationId,
+          'scheduledPickup': scheduledPickup,
+        }),
       );
 
       final data = json.decode(response.body);

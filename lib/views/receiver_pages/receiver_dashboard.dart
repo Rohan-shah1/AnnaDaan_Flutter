@@ -4,6 +4,7 @@ import '../../services/api_service.dart';
 import 'package:provider/provider.dart';
 import '../donor_pages/impact_screen.dart';
 import '../pages/profile_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReceiverDashboard extends StatefulWidget {
   const ReceiverDashboard({super.key});
@@ -120,6 +121,24 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
     }
   }
 
+  String _formatDistance(dynamic distance) {
+    if (distance == null) return 'N/A';
+    double dist = double.tryParse(distance.toString()) ?? 0.0;
+    if (dist < 1) {
+      return '${(dist * 1000).toInt()} m';
+    }
+    return '${dist.toStringAsFixed(1)} km';
+  }
+
+  Future<void> _openMap(double lat, double lng) async {
+    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch maps')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -129,8 +148,8 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       );
     }
 
-    final activePickups = _reservations.where((item) => item['status'] == 'PENDING' || item['status'] == 'ACCEPTED').toList();
-    final completedPickups = _reservations.where((item) => item['status'] == 'PICKED_UP' || item['status'] == 'COMPLETED').toList();
+    final activePickups = _reservations.where((item) => item['status'] == 'confirmed' || item['status'] == 'scheduled').toList();
+    final completedPickups = _reservations.where((item) => item['status'] == 'picked_up' || item['status'] == 'completed').toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -209,6 +228,11 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
 
   Widget _buildReservedPickupCard(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
+    final location = donation['location'] ?? {};
+    final coordinates = location['coordinates'] ?? {};
+    final double? lat = coordinates['lat'] != null ? double.tryParse(coordinates['lat'].toString()) : null;
+    final double? lng = coordinates['lng'] != null ? double.tryParse(coordinates['lng'].toString()) : null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -249,7 +273,24 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
               const Icon(Icons.inventory_2, size: 16, color: Colors.grey),
               const SizedBox(width: 8),
               Text(
-                donation['quantity'] ?? 'N/A',
+                donation['quantity'] is Map
+                    ? '${donation['quantity']['value']} ${donation['quantity']['unit']}'
+                    : '${donation['quantity'] ?? 'N/A'}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.near_me, size: 16, color: Colors.grey),
+              const SizedBox(width: 8),
+              Text(
+                'Distance: ${_formatDistance(reservation['distance'])}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[700],
@@ -280,7 +321,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  donation['location']?['address'] ?? 'N/A',
+                  location['address'] ?? 'N/A',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[700],
@@ -291,28 +332,49 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          if (reservation['status'] == 'ACCEPTED')
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _markAsPickedUp(reservation),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1565C0),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+          Row(
+            children: [
+              if (lat != null && lng != null)
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _openMap(lat, lng),
+                    icon: const Icon(Icons.map, size: 18),
+                    label: const Text('Open Map'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: const BorderSide(color: Color(0xFF1565C0)),
+                      foregroundColor: const Color(0xFF1565C0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
-                child: const Text(
-                  'Mark as Picked Up',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
+              if (lat != null && lng != null) const SizedBox(width: 12),
+              if (reservation['status'] == 'confirmed')
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _markAsPickedUp(reservation),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1565C0),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Mark Picked Up',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+            ],
+          ),
         ],
       ),
     );
@@ -389,7 +451,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                 final apiService = Provider.of<ApiService>(context, listen: false);
                 final result = await apiService.updateReservationStatus(
                   reservation['_id'],
-                  'PICKED_UP',
+                  'picked_up',
                 );
 
                 if (result['success']) {

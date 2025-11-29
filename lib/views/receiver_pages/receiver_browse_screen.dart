@@ -25,10 +25,30 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
   List<dynamic> _nearbyDonations = [];
   bool _isLoading = true;
 
+  int _reservedCount = 0;
+  int _completedCount = 0;
+
   @override
   void initState() {
     super.initState();
     _fetchDonations();
+    _fetchStats();
+  }
+
+  Future<void> _fetchStats() async {
+    try {
+      final apiService = Provider.of<ApiService>(context, listen: false);
+      final stats = await apiService.getDashboardStats();
+      
+      if (mounted) {
+        setState(() {
+          _reservedCount = stats['activeReservations'] ?? 0;
+          _completedCount = stats['completedReservations'] ?? 0;
+        });
+      }
+    } catch (e) {
+      print('Error fetching stats: $e');
+    }
   }
 
   Future<void> _fetchDonations() async {
@@ -235,8 +255,8 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildStatCard('${filteredDonations.length}', 'Available', const Color(0xFF1976D2)),
-                  _buildStatCard('0', 'Reserved', const Color(0xFF1976D2)),
-                  _buildStatCard('0', 'Completed', const Color(0xFF1976D2)),
+                  _buildStatCard('$_reservedCount', 'Reserved', const Color(0xFF1976D2)),
+                  _buildStatCard('$_completedCount', 'Completed', const Color(0xFF1976D2)),
                 ],
               ),
             ],
@@ -535,8 +555,9 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                       backgroundColor: Colors.green,
                     ),
                   );
-                  // Refresh list
+                  // Refresh list and stats
                   _fetchDonations();
+                  _fetchStats();
                 } else {
                   ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                     SnackBar(

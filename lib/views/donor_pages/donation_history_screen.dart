@@ -190,6 +190,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
             impact: donation['impact'] ?? '',
             type: donation['type'] ?? '',
             quantity: donation['quantity'] ?? '',
+            donation: donation,
           ),
           const SizedBox(height: 20),
           _buildViewReceiptButton(donation),
@@ -218,7 +219,17 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
     );
   }
 
-  Widget _buildDonationItem({required String title, required String time, required String organization, required String impact, required String type, required String quantity}) {
+  Widget _buildDonationItem({
+    required String title, 
+    required String time, 
+    required String organization, 
+    required String impact, 
+    required String type, 
+    required String quantity,
+    required Map<String, dynamic> donation
+  }) {
+    final canRate = donation['status'] == 'picked_up' || donation['status'] == 'completed';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -255,7 +266,177 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
             const SizedBox(width: 6),
             Text('$type • $quantity', style: const TextStyle(fontSize: 14, color: Colors.grey, fontFamily: 'Poppins')),
           ]),
+          if (canRate) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _handleRateReceiver(donation),
+                icon: const Icon(Icons.star_outline, size: 18),
+                label: const Text('Rate Receiver'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: const BorderSide(color: Color(0xFF1565C0)),
+                  foregroundColor: const Color(0xFF1565C0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+
+  Future<void> _handleRateReceiver(Map<String, dynamic> donation) async {
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final api = Provider.of<ApiService>(context, listen: false);
+      final reservations = await api.getDonationReservations(donation['id']);
+      
+      Navigator.pop(context); // Hide loading
+
+      // Find the completed reservation
+      final completedReservation = reservations.firstWhere(
+        (res) => res['status'] == 'picked_up' || res['status'] == 'completed',
+        orElse: () => null,
+      );
+
+      if (completedReservation != null) {
+        // Check if already rated
+        if (completedReservation['donorRating'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('You have already rated this receiver')),
+          );
+          return;
+        }
+        _showRatingDialog(completedReservation['_id']);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No completed reservation found to rate')),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Hide loading if error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  void _showRatingDialog(String reservationId) {
+    int selectedRating = 0;
+    final feedbackController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Rate Receiver', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'How was your experience with this receiver?',
+                    style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: Icon(
+                          index < selectedRating ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            selectedRating = index + 1;
+                          });
+                        },
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: feedbackController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Add feedback (optional)',
+                      hintStyle: const TextStyle(fontFamily: 'Poppins'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    style: const TextStyle(fontFamily: 'Poppins'),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel', style: TextStyle(fontFamily: 'Poppins')),
+              ),
+              ElevatedButton(
+                onPressed: selectedRating > 0
+                    ? () async {
+                        Navigator.pop(context);
+                        try {
+                          final apiService = Provider.of<ApiService>(context, listen: false);
+                          final result = await apiService.submitRating(
+                            reservationId,
+                            selectedRating,
+                            feedback: feedbackController.text.trim(),
+                          );
+                          if (result['success']) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Thank you for your feedback!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(result['message'] ?? 'Failed to submit rating'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E7D32),
+                  disabledBackgroundColor: Colors.grey,
+                ),
+                child: const Text('Submit', style: TextStyle(fontFamily: 'Poppins', color: Colors.white)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

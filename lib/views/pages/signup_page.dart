@@ -52,15 +52,31 @@ class _SignupScreenState extends State<SignupScreen> {
       });
 
       if (result['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sign up successful! Please select your role.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Navigate to role selection after successful signup
-        Navigator.pushReplacementNamed(context, '/role-selection');
+        if (result['requiresVerification'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please verify your email to continue.'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+          
+          Navigator.pushReplacementNamed(
+            context, 
+            '/verify-otp',
+            arguments: {
+              'email': _emailController.text,
+              'userId': result['userId'] ?? '',
+            },
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Sign up successful! Please select your role.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pushReplacementNamed(context, '/role-selection');
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -27,6 +27,9 @@ import 'package:annadaan/views/pages/settings_screen.dart';
 import 'package:annadaan/views/pages/help_support_screen.dart';
 import 'package:annadaan/views/pages/about_screen.dart';
 import 'package:annadaan/views/receiver_pages/receiver_browse_screen.dart';
+import 'package:annadaan/views/pages/otp_verification_screen.dart';
+import 'package:annadaan/views/pages/forgot_password_screen.dart';
+import 'package:annadaan/views/pages/reset_password_screen.dart';
 
 void main() {
   runZonedGuarded(() async {
@@ -84,6 +87,22 @@ class Annadaan extends StatelessWidget {
         '/help-support': (context) => const HelpSupportScreen(),
         '/about': (context) => const AboutScreen(),
         '/receiver_browse': (context) => const ReceiverBrowseScreen(),
+        '/verify-otp': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return OtpVerificationScreen(
+            email: args['email'],
+            userId: args['userId'] ?? '',
+            isPasswordReset: args['isPasswordReset'] ?? false,
+          );
+        },
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/reset-password': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return ResetPasswordScreen(
+            email: args['email'],
+            otp: args['otp'],
+          );
+        },
       },
       builder: (context, child) {
         return MediaQuery(

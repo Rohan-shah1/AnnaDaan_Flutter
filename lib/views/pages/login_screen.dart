@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // Navigate to forgot password screen
+                          Navigator.pushNamed(context, '/forgot-password');
                         },
                         child: Text(
                           'Forgot Password?',
@@ -306,7 +306,11 @@ class _LoginPageState extends State<LoginScreen> {
     if (result['success'] == true) {
       _navigateAfterLogin(apiService);
     } else {
-      _showErrorDialog(result['message']);
+      if (result['message'].toString().contains('verify your email')) {
+        _showVerificationDialog(_emailController.text);
+      } else {
+        _showErrorDialog(result['message']);
+      }
     }
   }
 
@@ -399,6 +403,33 @@ class _LoginPageState extends State<LoginScreen> {
     }
   }
 
+
+  void _showVerificationDialog(String email) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Email Not Verified'),
+        content: const Text('Please verify your email address to log in.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(
+                context,
+                '/verify-otp',
+                arguments: {'email': email, 'userId': ''},
+              );
+            },
+            child: const Text('Verify Now'),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showErrorDialog(String message) {
     showDialog(

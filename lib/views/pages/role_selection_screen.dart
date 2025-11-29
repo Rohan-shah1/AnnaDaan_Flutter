@@ -18,57 +18,59 @@ class RoleSelectionScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 40),
-              Text(
-                'AnnaDaan',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
-                  fontFamily: 'Poppins',
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 40),
+                Text(
+                  'AnnaDaan',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[800],
+                    fontFamily: 'Poppins',
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Choose your role to continue',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[700],
-                  fontFamily: 'Poppins',
-                  height: 1.5,
+                SizedBox(height: 16),
+                Text(
+                  'Choose your role to continue',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                    fontFamily: 'Poppins',
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              SizedBox(height: 80),
-              // Donor Card
-              _buildRoleCard(
-                'I\'m a Donor',
-                'Residential, hotels, restaurants, and caterers sharing surplus food',
-                Icons.restaurant,
-                Colors.green,
-                    () {
-                  print('Donor selected - navigating to donor form');
-                  Navigator.pushReplacementNamed(context, '/donor-form');
-                },
-              ),
-              SizedBox(height: 24),
-              // Receiver Card
-              _buildRoleCard(
-                'I\'m a Receiver',
-                'NGOs, social workers, and activists collecting food for communities',
-                Icons.people,
-                Colors.orange,
-                    () {
-                  print('Receiver selected - navigating to receiver form');
-                  Navigator.pushReplacementNamed(context, '/receiver-form');
-                },
-              ),
-            ],
+                SizedBox(height: 80),
+                // Donor Card
+                _buildRoleCard(
+                  'I\'m a Donor',
+                  'Residential, hotels, restaurants, and caterers sharing surplus food',
+                  Icons.restaurant,
+                  Colors.green,
+                  () {
+                    print('Donor selected - navigating to donor form');
+                    Navigator.pushReplacementNamed(context, '/donor-form');
+                  },
+                ),
+                SizedBox(height: 24),
+                // Receiver Card
+                _buildRoleCard(
+                  'I\'m a Receiver',
+                  'NGOs, social workers, and activists collecting food for communities',
+                  Icons.people,
+                  Colors.orange,
+                  () {
+                    print('Receiver selected - navigating to receiver form');
+                    Navigator.pushReplacementNamed(context, '/receiver-form');
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

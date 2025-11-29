@@ -20,7 +20,6 @@ import 'package:annadaan/views/donor_pages/post_donation_screen.dart';
 import 'package:annadaan/views/donor_pages/donation_history_screen.dart';
 import 'package:annadaan/views/donor_pages/active_donations_screen.dart';
 import 'package:annadaan/views/donor_pages/impact_screen.dart';
-import 'package:annadaan/views/pages/preferred_ngos_screen.dart';
 import 'package:annadaan/views/pages/notifications_screen.dart';
 import 'package:annadaan/views/pages/profile_screen.dart';
 import 'package:annadaan/views/pages/edit_profile_screen.dart';
@@ -78,7 +77,6 @@ class Annadaan extends StatelessWidget {
         '/donation-history': (context) => const DonationHistoryScreen(),
         '/active-donations': (context) => const ActiveDonationsScreen(),
         '/impact-screen': (context) => const ImpactScreen(),
-        '/preferred-ngos': (context) => const PreferredNgosScreen(),
         '/notifications': (context) => const NotificationsScreen(),
         '/profile-screen': (context) => const ProfileScreen(),
         '/edit-profile': (context) => const EditProfileScreen(),

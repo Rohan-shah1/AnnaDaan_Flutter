@@ -116,6 +116,7 @@ class _ImpactScreenState extends State<ImpactScreen> {
     final estimatedMeals = _impactData['estimatedMeals']?.toString() ?? '0';
     final totalDonations = _impactData['totalDonations']?.toString() ?? '0';
     final peopleHelped = _impactData['peopleHelped']?.toString() ?? '0';
+    final rating = _impactData['rating'];
 
     final foodCollected = _impactData['foodCollected'] ?? foodSaved;
     final pickupsDone = _impactData['pickupsDone']?.toString() ?? totalDonations;
@@ -170,6 +171,52 @@ class _ImpactScreenState extends State<ImpactScreen> {
               ),
             ],
           ),
+          
+          // Rating display
+          if (rating != null && rating > 0) ...[
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.star, color: Colors.amber, size: 28),
+                  const SizedBox(width: 8),
+                  Text(
+                    rating.toString(),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '/ 5.0',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.9),
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isDonor ? 'Average Rating' : 'Your Rating',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withOpacity(0.9),
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

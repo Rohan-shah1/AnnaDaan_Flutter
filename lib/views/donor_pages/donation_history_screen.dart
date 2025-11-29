@@ -71,7 +71,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
         'title': don['foodDescription'] ?? 'Food Donation',
         'time': _formatDate(don['createdAt']),
         'organization': don['reservedBy']?['organizationName'] ?? 'Unknown Receiver',
-        'impact': 'Helped ${don['quantity']?['value'] ?? 0} people', // Estimate
+        'impact': _calculateImpact(don['quantity']),
         'type': _formatFoodType(don['foodType']),
         'quantity': '${don['quantity']?['value']} ${don['quantity']?['unit']}',
         'status': don['status'],
@@ -85,6 +85,27 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
     final date = DateTime.tryParse(dateStr);
     if (date == null) return '';
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _calculateImpact(dynamic quantity) {
+    if (quantity == null || quantity['value'] == null) return 'Helped 0 people';
+    
+    final value = (quantity['value'] is int) 
+        ? quantity['value'] 
+        : double.tryParse(quantity['value'].toString())?.toInt() ?? 0;
+    final unit = (quantity['unit'] ?? '').toString().toLowerCase();
+    
+    int peopleHelped = 0;
+    
+    if (unit == 'portions') {
+      peopleHelped = value; // 1 portion = 1 person
+    } else if (unit == 'crates' || unit == 'boxes') {
+      peopleHelped = value * 26; // 1 crate/box = 26 people
+    } else {
+      peopleHelped = value; // Default: use raw value
+    }
+    
+    return 'Helped $peopleHelped people';
   }
 
   String _formatFoodType(String? type) {

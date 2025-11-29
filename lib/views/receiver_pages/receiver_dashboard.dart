@@ -495,8 +495,20 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1565C0)),
-            child: const Text('Yes, Picked Up'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1565C0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Yes, Picked Up',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
         ],
       ),

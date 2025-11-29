@@ -16,8 +16,8 @@ class _LocationPickerState extends State<LocationPicker> {
   String? _selectedAddress;
   bool _isLoading = true;
   
-  // Default to a central location (e.g., New Delhi) if permission denied or error
-  static const LatLng _defaultLocation = LatLng(28.6139, 77.2090);
+  // Default to a central location (e.g., Kathmandu) if permission denied or error
+  static const LatLng _defaultLocation = LatLng(27.7172, 85.3240);
   LatLng _initialPosition = _defaultLocation;
 
   @override

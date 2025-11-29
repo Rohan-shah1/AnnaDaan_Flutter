@@ -321,7 +321,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
       );
 
       final api = Provider.of<ApiService>(context, listen: false);
-      final reservations = await api.getDonationReservations(donation['id']);
+      final reservations = await api.getDonationReservations(donation['_id']);
       
       Navigator.pop(context); // Hide loading
 

@@ -76,8 +76,18 @@ class ApiService with ChangeNotifier {
       final data = json.decode(response.body);
 
       if (response.statusCode == 201) {
-        _handleAuthSuccess(data);
-        return {'success': true, 'message': 'Registration successful'};
+        // Only save token if verification is not required
+        if (data['requiresVerification'] != true && data['token'] != null) {
+          _handleAuthSuccess(data);
+        }
+        // Return the complete response data to signup page
+        return {
+          'success': true,
+          'requiresVerification': data['requiresVerification'] ?? false,
+          'userId': data['userId'],
+          'email': data['email'],
+          'message': data['message'] ?? 'Registration successful'
+        };
       } else {
         return {'success': false, 'message': data['message'] ?? 'Registration failed'};
       }

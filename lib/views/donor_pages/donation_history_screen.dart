@@ -76,6 +76,8 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
         'quantity': '${don['quantity']?['value']} ${don['quantity']?['unit']}',
         'status': don['status'],
         'id': don['_id'],
+        'donorRating': don['donorRating'],
+        'donorFeedback': don['donorFeedback'],
       };
     }).toList();
   }
@@ -250,6 +252,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
     required Map<String, dynamic> donation
   }) {
     final canRate = donation['status'] == 'picked_up' || donation['status'] == 'completed';
+    final hasRating = donation['donorRating'] != null;
 
     return Container(
       width: double.infinity,
@@ -287,7 +290,49 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
             const SizedBox(width: 6),
             Text('$type • $quantity', style: const TextStyle(fontSize: 14, color: Colors.grey, fontFamily: 'Poppins')),
           ]),
-          if (canRate) ...[
+          if (hasRating) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.star, size: 20, color: Colors.amber.shade700),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${donation['donorRating']?.toStringAsFixed(1) ?? "0.0"}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade700,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                  if (donation['donorFeedback'] != null && (donation['donorFeedback'] as String).isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '- "${donation['donorFeedback']}"',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
+                          fontFamily: 'Poppins',
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ] else if (canRate) ...[
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,

@@ -211,6 +211,45 @@ class _ImpactScreenState extends State<ImpactScreen> {
   }
 
   Widget _buildAchievementsSection(bool isDonor) {
+    final achievements = _impactData['achievements'] as List<dynamic>? ?? [];
+    
+    if (achievements.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          children: const [
+            Icon(Icons.emoji_events_outlined, size: 48, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'Keep up the good work!',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+                fontFamily: 'Poppins',
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Continue donating to unlock achievements',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+                fontFamily: 'Poppins',
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -232,97 +271,70 @@ class _ImpactScreenState extends State<ImpactScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildAchievementCard(isDonor),
-          const SizedBox(height: 12),
-          _buildAchievementCard2(isDonor),
+          ...achievements.map((achievement) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildAchievementCard(achievement),
+          )).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildAchievementCard(bool isDonor) {
+  Widget _buildAchievementCard(Map<String, dynamic> achievement) {
+    final type = achievement['type'] ?? 'trophy';
+    final title = achievement['title'] ?? 'Achievement';
+    final description = achievement['description'] ?? '';
+    final iconName = achievement['icon'] ?? 'trophy';
+
+    Color cardColor;
+    Color iconColor;
+    IconData icon;
+
+    // Map achievement types to colors and icons
+    if (type == 'rating' || iconName == 'star') {
+      cardColor = Colors.amber.shade50;
+      iconColor = Colors.amber.shade700;
+      icon = Icons.star;
+    } else if (type == 'environmental' || iconName == 'eco') {
+      cardColor = Colors.blue.shade50;
+      iconColor = Colors.blue.shade700;
+      icon = Icons.eco;
+    } else {
+      cardColor = Colors.amber.shade50;
+      iconColor = Colors.amber.shade700;
+      icon = Icons.emoji_events;
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.amber.shade50,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.shade200),
+        border: Border.all(color: iconColor.withOpacity(0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.emoji_events, color: Colors.amber.shade700, size: 32),
+          Icon(icon, color: iconColor, size: 32),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isDonor ? 'Top Donor This Month' : 'Most Active NGO',
+                  title,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.amber.shade800,
+                    color: iconColor,
                     fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isDonor
-                      ? "You're in the top 10% of donors in your area!"
-                      : "Ranked #1 in your area this month!",
+                  description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.amber.shade700,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementCard2(bool isDonor) {
-    final foodSaved = _impactData['foodSaved'] ?? '480kg';
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade200),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isDonor ? Icons.eco : Icons.star,
-            color: isDonor ? Colors.blue.shade700 : Colors.yellow.shade700,
-            size: 32,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isDonor ? 'Environmental Champion' : '5.0 Rating',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDonor ? Colors.blue.shade800 : Colors.yellow.shade800,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isDonor
-                      ? 'Saved $foodSaved of food from waste!'
-                      : 'Perfect rating from all donors',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDonor ? Colors.blue.shade700 : Colors.yellow.shade700,
+                    color: iconColor,
                     fontFamily: 'Poppins',
                   ),
                 ),

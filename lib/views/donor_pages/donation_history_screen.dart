@@ -410,6 +410,8 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
                                 backgroundColor: Colors.green,
                               ),
                             );
+                            // Refresh the donations list to show the rating immediately
+                            _fetchDonations();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(

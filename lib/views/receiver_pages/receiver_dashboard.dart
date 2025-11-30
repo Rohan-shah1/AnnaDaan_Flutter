@@ -607,7 +607,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
+        builder: (context, setDialogState) {
           return AlertDialog(
             title: const Text('Rate Your Experience', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
             content: SingleChildScrollView(
@@ -632,7 +632,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                           size: 32,
                         ),
                         onPressed: () {
-                          setState(() {
+                          setDialogState(() {
                             selectedRating = index + 1;
                           });
                         },
@@ -666,11 +666,25 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                         Navigator.pop(context);
                         try {
                           final apiService = Provider.of<ApiService>(context, listen: false);
+                          
+                          // Optimistic update
+                          if (mounted) {
+                            setState(() {
+                              final index = _reservations.indexWhere((r) => r['_id'] == reservation['_id']);
+                              if (index != -1) {
+                                _reservations[index]['rating'] = selectedRating;
+                                // Also update local object to reflect immediately in UI if passed by reference
+                                reservation['rating'] = selectedRating; 
+                              }
+                            });
+                          }
+
                           final result = await apiService.submitRating(
                             reservation['_id'],
                             selectedRating,
                             feedback: feedbackController.text.trim(),
                           );
+
                           if (result['success']) {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -680,9 +694,18 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                                 ),
                               );
                             }
+                            // Fetch fresh data to ensure consistency
                             await _fetchReservations();
                           } else {
+                            // Revert optimistic update on failure
                             if (mounted) {
+                              setState(() {
+                                final index = _reservations.indexWhere((r) => r['_id'] == reservation['_id']);
+                                if (index != -1) {
+                                  _reservations[index].remove('rating');
+                                  reservation.remove('rating');
+                                }
+                              });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(result['message'] ?? 'Failed to submit rating'),
@@ -692,7 +715,15 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                             }
                           }
                         } catch (e) {
+                          // Revert optimistic update on error
                           if (mounted) {
+                            setState(() {
+                              final index = _reservations.indexWhere((r) => r['_id'] == reservation['_id']);
+                              if (index != -1) {
+                                _reservations[index].remove('rating');
+                                reservation.remove('rating');
+                              }
+                            });
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Error: $e'),

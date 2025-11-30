@@ -64,7 +64,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Notifications',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -74,7 +74,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.black87),
         actions: [
           if (_notifications.isNotEmpty)
             PopupMenuButton<String>(
@@ -91,8 +91,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Row(
                     children: [
                       Icon(Icons.mark_email_read, color: Colors.grey.shade700),
-                      SizedBox(width: 8),
-                      Text('Mark all as read', style: TextStyle(fontFamily: 'Poppins')),
+                      const SizedBox(width: 8),
+                      const Text('Mark all as read', style: TextStyle(fontFamily: 'Poppins')),
                     ],
                   ),
                 ),
@@ -101,8 +101,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Row(
                     children: [
                       Icon(Icons.clear_all, color: Colors.grey.shade700),
-                      SizedBox(width: 8),
-                      Text('Clear all', style: TextStyle(fontFamily: 'Poppins')),
+                      const SizedBox(width: 8),
+                      const Text('Clear all', style: TextStyle(fontFamily: 'Poppins')),
                     ],
                   ),
                 ),
@@ -111,11 +111,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _notifications.isEmpty
               ? _buildEmptyState()
               : ListView.builder(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   itemCount: _notifications.length,
                   itemBuilder: (context, index) {
                     final notification = _notifications[index];
@@ -135,7 +135,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             size: 80,
             color: Colors.grey.shade400,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             'No Notifications',
             style: TextStyle(
@@ -145,7 +145,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               fontFamily: 'Poppins',
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             'You\'re all caught up!',
             style: TextStyle(
@@ -166,9 +166,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: 20),
-        margin: EdgeInsets.only(bottom: 16),
-        child: Icon(Icons.delete, color: Colors.white),
+        padding: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.only(bottom: 16),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
@@ -176,7 +176,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           _notifications.removeWhere((item) => item['_id'] == notification['_id']);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Notification cleared')),
+          const SnackBar(content: Text('Notification cleared')),
         );
       },
       child: GestureDetector(
@@ -187,20 +187,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           _showNotificationDetails(notification);
         },
         child: Container(
-          margin: EdgeInsets.only(bottom: 16),
-          padding: EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isRead ? Colors.white : Color(0xFFE8F5E9),
+            color: isRead ? Colors.white : const Color(0xFFE8F5E9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isRead ? Colors.grey.shade200 : Color(0xFFC8E6C9),
+              color: isRead ? Colors.grey.shade200 : const Color(0xFFC8E6C9),
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.05),
                 spreadRadius: 1,
                 blurRadius: 4,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -208,7 +208,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: _getIconColor(notification['type'] ?? 'system').withOpacity(0.1),
                   shape: BoxShape.circle,
@@ -219,7 +219,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   size: 24,
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +233,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: isRead ? Colors.black87 : Color(0xFF2E7D32),
+                              color: isRead ? Colors.black87 : const Color(0xFF2E7D32),
                               fontFamily: 'Poppins',
                             ),
                           ),
@@ -250,7 +250,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
                       notification['message'] ?? '',
                       style: TextStyle(
@@ -296,11 +296,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             children: [
               Icon(_getNotificationIcon(notification['type'] ?? 'system'),
                   color: _getNotificationColor(notification['type'] ?? 'system')),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   notification['title'] ?? 'Notification',
-                  style: TextStyle(fontFamily: 'Poppins'),
+                  style: const TextStyle(fontFamily: 'Poppins'),
                 ),
               ),
             ],
@@ -312,21 +312,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               children: [
                 Text(
                   notification['message'] ?? '',
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 16),
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 16),
                 ),
-                SizedBox(height: 16),
-                Divider(),
-                SizedBox(height: 8),
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 8),
                 Text(
                   'Time: ${notification['createdAt'] != null ? _formatTime(notification['createdAt']) : 'Just now'}',
                   style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.shade600),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'Status: ${(notification['isRead'] ?? false) ? 'Read' : 'Unread'}',
                   style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.shade600),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Action buttons based on notification type
                 if (notification['type'] == 'reservation')
@@ -341,7 +341,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close', style: TextStyle(fontFamily: 'Poppins')),
+              child: const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
             ),
             if (!(notification['isRead'] ?? false))
               TextButton(
@@ -349,7 +349,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   _markAsRead(notification['_id']);
                   Navigator.of(context).pop();
                 },
-                child: Text('Mark as Read', style: TextStyle(fontFamily: 'Poppins')),
+                child: const Text('Mark as Read', style: TextStyle(fontFamily: 'Poppins')),
               ),
           ],
         );
@@ -358,29 +358,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildReservationActions() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            _showMessage('Contacting Hope Foundation...');
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF2E7D32),
-          ),
-          child: Text('Contact NGO',selectionColor: Colors.white, style: TextStyle(fontFamily: 'Poppins')),
-        ),
-        SizedBox(height: 8),
-        OutlinedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            _showMessage('Viewing donation details...');
-          },
-          child: Text('View Donation', style: TextStyle(fontFamily: 'Poppins')),
-        ),
-      ],
-    );
+    // Buttons removed as per user request
+    return const SizedBox.shrink();
   }
 
   Widget _buildRequestActions() {
@@ -393,19 +372,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               _showMessage('Donation request accepted!');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF2E7D32),
+              backgroundColor: const Color(0xFF2E7D32),
             ),
-            child: Text('Accept', style: TextStyle(fontFamily: 'Poppins')),
+            child: const Text('Accept', style: TextStyle(fontFamily: 'Poppins')),
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: OutlinedButton(
             onPressed: () {
               Navigator.of(context).pop();
               _showMessage('Donation request declined');
             },
-            child: Text('Decline', style: TextStyle(fontFamily: 'Poppins')),
+            child: const Text('Decline', style: TextStyle(fontFamily: 'Poppins')),
           ),
         ),
       ],
@@ -424,15 +403,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.orange.shade600,
           ),
-          child: Text('Extend Expiry', style: TextStyle(fontFamily: 'Poppins')),
+          child: const Text('Extend Expiry', style: TextStyle(fontFamily: 'Poppins')),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         OutlinedButton(
           onPressed: () {
             Navigator.of(context).pop();
             _showMessage('Opening donation management...');
           },
-          child: Text('Manage Donation', style: TextStyle(fontFamily: 'Poppins')),
+          child: const Text('Manage Donation', style: TextStyle(fontFamily: 'Poppins')),
         ),
       ],
     );
@@ -441,8 +420,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(fontFamily: 'Poppins')),
-        duration: Duration(seconds: 2),
+        content: Text(message, style: const TextStyle(fontFamily: 'Poppins')),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -450,19 +429,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Color _getNotificationColor(String type) {
     switch (type) {
       case 'reservation':
-        return Color(0xFF4CAF50); // Green
+        return const Color(0xFF4CAF50); // Green
       case 'request':
-        return Color(0xFF2196F3); // Blue
+        return const Color(0xFF2196F3); // Blue
       case 'completion':
-        return Color(0xFF9C27B0); // Purple
+        return const Color(0xFF9C27B0); // Purple
       case 'impact':
-        return Color(0xFFFF9800); // Orange
+        return const Color(0xFFFF9800); // Orange
       case 'interest':
-        return Color(0xFF607D8B); // Blue Grey
+        return const Color(0xFF607D8B); // Blue Grey
       case 'reminder':
-        return Color(0xFFF44336); // Red
+        return const Color(0xFFF44336); // Red
       default:
-        return Color(0xFF2E7D32); // Default green
+        return const Color(0xFF2E7D32); // Default green
     }
   }
 

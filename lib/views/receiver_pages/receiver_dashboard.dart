@@ -532,21 +532,34 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                   'picked_up',
                 );
                 if (result['success']) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Pickup confirmed! Impact updated.'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                  if (mounted) {
+                    setState(() {
+                      final index = _reservations.indexWhere((r) => r['_id'] == reservation['_id']);
+                      if (index != -1) {
+                        _reservations[index]['status'] = 'picked_up';
+                        _reservations[index]['updatedAt'] = DateTime.now().toIso8601String();
+                      }
+                    });
+                  }
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Pickup confirmed! Impact updated.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
                   _fetchReservations();
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error updating status: $e'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error updating status: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -633,7 +646,6 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                 onPressed: selectedRating > 0
                     ? () async {
                         Navigator.pop(context);
-                        
                         try {
                           final apiService = Provider.of<ApiService>(context, listen: false);
                           final result = await apiService.submitRating(

@@ -369,7 +369,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Color(0xFF2E7D32),
           ),
-          child: Text('Contact NGO', style: TextStyle(fontFamily: 'Poppins')),
+          child: Text('Contact NGO',selectionColor: Colors.white, style: TextStyle(fontFamily: 'Poppins')),
         ),
         SizedBox(height: 8),
         OutlinedButton(

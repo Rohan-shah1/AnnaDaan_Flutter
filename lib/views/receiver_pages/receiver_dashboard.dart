@@ -142,15 +142,19 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
       final data = await apiService.getMyReservations();
-      setState(() {
-        _reservations = List<Map<String, dynamic>>.from(data);
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _reservations = List<Map<String, dynamic>>.from(data);
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       print('Error fetching reservations: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -166,9 +170,11 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
   Future<void> _openMap(double lat, double lng) async {
     final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch maps')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch maps')),
+        );
+      }
     }
   }
 
@@ -531,16 +537,24 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                   reservation['_id'],
                   'picked_up',
                 );
+                
+                print('API Response: $result');
+                
                 if (result['success']) {
+                  print('Updating UI optimistically...');
                   if (mounted) {
                     setState(() {
                       final index = _reservations.indexWhere((r) => r['_id'] == reservation['_id']);
+                      print('Found at index: $index');
                       if (index != -1) {
+                        print('Old status: ${_reservations[index]['status']}');
                         _reservations[index]['status'] = 'picked_up';
                         _reservations[index]['updatedAt'] = DateTime.now().toIso8601String();
+                        print('New status: ${_reservations[index]['status']}');
                       }
                     });
                   }
+                  
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -549,9 +563,13 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                       ),
                     );
                   }
-                  _fetchReservations();
+                  
+                  print('Fetching fresh data from server...');
+                  await _fetchReservations();
+                  print('UI refresh complete');
                 }
               } catch (e) {
+                print('Error in _markAsPickedUp: $e');
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -654,28 +672,34 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
                             feedback: feedbackController.text.trim(),
                           );
                           if (result['success']) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Thank you for your feedback!'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                            _fetchReservations();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Thank you for your feedback!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                            await _fetchReservations();
                           } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(result['message'] ?? 'Failed to submit rating'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        } catch (e) {
+                          if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(result['message'] ?? 'Failed to submit rating'),
+                                content: Text('Error: $e'),
                                 backgroundColor: Colors.red,
                               ),
                             );
                           }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
                         }
                       }
                     : null,

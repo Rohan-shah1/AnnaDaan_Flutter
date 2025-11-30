@@ -40,7 +40,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     setState(() {
       final index = _notifications.indexWhere((n) => n['_id'] == id);
       if (index != -1) {
-        _notifications[index]['read'] = true;
+        _notifications[index]['isRead'] = true;
       }
     });
 
@@ -160,7 +160,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildNotificationItem(dynamic notification) {
-    bool isRead = notification['read'] ?? false;
+    bool isRead = notification['isRead'] ?? false;
     return Dismissible(
       key: Key(notification['_id'] ?? UniqueKey().toString()),
       background: Container(
@@ -323,7 +323,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Status: ${(notification['read'] ?? false) ? 'Read' : 'Unread'}',
+                  'Status: ${(notification['isRead'] ?? false) ? 'Read' : 'Unread'}',
                   style: TextStyle(fontFamily: 'Poppins', color: Colors.grey.shade600),
                 ),
                 SizedBox(height: 16),
@@ -343,7 +343,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onPressed: () => Navigator.of(context).pop(),
               child: Text('Close', style: TextStyle(fontFamily: 'Poppins')),
             ),
-            if (!(notification['read'] ?? false))
+            if (!(notification['isRead'] ?? false))
               TextButton(
                 onPressed: () {
                   _markAsRead(notification['_id']);

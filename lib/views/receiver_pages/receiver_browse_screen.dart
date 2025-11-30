@@ -4,7 +4,14 @@ import 'package:geolocator/geolocator.dart';
 import '../../services/api_service.dart';
 
 class ReceiverBrowseScreen extends StatefulWidget {
-  const ReceiverBrowseScreen({super.key});
+  final VoidCallback? onNotificationPressed;
+  final int unreadNotifications;
+  
+  const ReceiverBrowseScreen({
+    super.key,
+    this.onNotificationPressed,
+    this.unreadNotifications = 0,
+  });
 
   @override
   _ReceiverBrowseScreenState createState() => _ReceiverBrowseScreenState();
@@ -214,21 +221,39 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                       ),
                       Row(
                         children: [
-                          // Notification Bell
+                          // Notification Bell with Badge
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.notifications_outlined,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/notifications');
-                              },
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.notifications_outlined,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  onPressed: widget.onNotificationPressed ?? () {
+                                    Navigator.pushNamed(context, '/notifications');
+                                  },
+                                ),
+                                if (widget.unreadNotifications > 0)
+                                  Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -400,107 +425,112 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
   }
 
   Widget _buildDonationCard(dynamic donation) {
+    final String? foodImageId = donation['foodImage'];
+    
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
+            color: Colors.grey.withOpacity(0.08),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                donation['foodDescription'] ?? 'Food Donation',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE3F2FD),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _getFoodTypeLabel(donation['foodType'] ?? ''),
-                  style: TextStyle(
-                    color: _getFoodTypeColor(donation['foodType'] ?? ''),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
-              ),
-            ],
+          // Thumbnail Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[100],
+              child: foodImageId != null && foodImageId.isNotEmpty
+                  ? Image.network(
+                      '${ApiService.baseUrl}/api/upload/$foodImageId',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.fastfood, color: Colors.grey);
+                      },
+                    )
+                  : const Icon(Icons.fastfood, color: Colors.grey),
+            ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.location_on, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  donation['location']?['address'] ?? 'Unknown Location',
+          const SizedBox(width: 16),
+          // Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        donation['foodDescription'] ?? 'Food Donation',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  donation['quantity'] is Map
+                      ? '${donation['quantity']['value']} ${donation['quantity']['unit']}'
+                      : '${donation['quantity'] ?? 'N/A'}',
                   style: TextStyle(
-                    color: Colors.grey[600],
                     fontSize: 14,
+                    color: Colors.grey[600],
                     fontFamily: 'Poppins',
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                'Pickup by: ${donation['pickupWindow']?['end'] ?? 'N/A'}',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3E0),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'POSTED',
+                        style: TextStyle(
+                          color: Color(0xFFFF9800),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () => _showReserveDialog(donation),
+                      child: const Text(
+                        'View All',
+                        style: TextStyle(
+                          color: Color(0xFF673AB7),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // Reserve functionality
-                _showReserveDialog(donation);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1565C0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Reserve',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              ],
             ),
           ),
         ],

@@ -18,11 +18,28 @@ class _DonorDashboardState extends State<DonorDashboard> {
   List<dynamic> _recentDonations = [];
   Map<String, dynamic> _stats = {};
   bool _isLoading = true;
+  int _unreadNotifications = 0;
 
   @override
   void initState() {
     super.initState();
     _fetchDashboardData();
+    _fetchUnreadNotifications();
+  }
+
+  Future<void> _fetchUnreadNotifications() async {
+    try {
+      final apiService = Provider.of<ApiService>(context, listen: false);
+      final notifications = await apiService.getNotifications();
+      
+      if (mounted) {
+        setState(() {
+          _unreadNotifications = notifications.where((n) => n['isRead'] != true).length;
+        });
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+    }
   }
 
   Future<void> _fetchDashboardData() async {
@@ -112,21 +129,40 @@ class _DonorDashboardState extends State<DonorDashboard> {
                       ),
                       Row(
                         children: [
-                          // Notification Bell
+                          // Notification Bell with Badge
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.notifications_outlined,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/notifications');
-                              },
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.notifications_outlined,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  onPressed: () async {
+                                    await Navigator.pushNamed(context, '/notifications');
+                                    _fetchUnreadNotifications();
+                                  },
+                                ),
+                                if (_unreadNotifications > 0)
+                                  Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),

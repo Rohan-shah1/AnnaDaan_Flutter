@@ -5,13 +5,38 @@ import 'package:provider/provider.dart';
 import '../donor_pages/impact_screen.dart';
 import '../pages/profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class ReceiverDashboard extends StatefulWidget {
   const ReceiverDashboard({super.key});
   @override
   _ReceiverDashboardState createState() => _ReceiverDashboardState();
 }
+
 class _ReceiverDashboardState extends State<ReceiverDashboard> {
   int _currentIndex = 0;
+  int _unreadNotifications = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUnreadNotifications();
+  }
+
+  Future<void> _fetchUnreadNotifications() async {
+    try {
+      final apiService = Provider.of<ApiService>(context, listen: false);
+      final notifications = await apiService.getNotifications();
+      
+      if (mounted) {
+        setState(() {
+          _unreadNotifications = notifications.where((n) => n['isRead'] != true).length;
+        });
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,10 +45,17 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
+
   Widget _buildCurrentScreen() {
     switch (_currentIndex) {
       case 0:
-        return const ReceiverBrowseScreen();
+        return ReceiverBrowseScreen(
+          onNotificationPressed: () async {
+            await Navigator.pushNamed(context, '/notifications');
+            _fetchUnreadNotifications();
+          },
+          unreadNotifications: _unreadNotifications,
+        );
       case 1:
         return _ReceiverReservedScreen();
       case 2:
@@ -31,9 +63,16 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
       case 3:
         return const ProfileScreen(showBottomNav: false);
       default:
-        return const ReceiverBrowseScreen();
+        return ReceiverBrowseScreen(
+          onNotificationPressed: () async {
+            await Navigator.pushNamed(context, '/notifications');
+            _fetchUnreadNotifications();
+          },
+          unreadNotifications: _unreadNotifications,
+        );
     }
   }
+
   Widget _buildBottomNavigationBar() {
     return Container(
       decoration: BoxDecoration(
@@ -82,19 +121,23 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
     );
   }
 }
+
 // Reserved Screen
 class _ReceiverReservedScreen extends StatefulWidget {
   @override
   __ReceiverReservedScreenState createState() => __ReceiverReservedScreenState();
 }
+
 class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
   List<Map<String, dynamic>> _reservations = [];
   bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     _fetchReservations();
   }
+
   Future<void> _fetchReservations() async {
     try {
       final apiService = Provider.of<ApiService>(context, listen: false);
@@ -110,6 +153,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       });
     }
   }
+
   String _formatDistance(dynamic distance) {
     if (distance == null) return 'N/A';
     double dist = double.tryParse(distance.toString()) ?? 0.0;
@@ -118,6 +162,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
     }
     return '${dist.toStringAsFixed(1)} km';
   }
+
   Future<void> _openMap(double lat, double lng) async {
     final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -126,6 +171,7 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -134,8 +180,10 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
     final activePickups = _reservations.where((item) => item['status'] == 'confirmed' || item['status'] == 'scheduled').toList();
     final completedPickups = _reservations.where((item) => item['status'] == 'picked_up' || item['status'] == 'completed').toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -208,12 +256,14 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       ),
     );
   }
+
   Widget _buildReservedPickupCard(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
     final location = donation['location'] ?? {};
     final coordinates = location['coordinates'] ?? {};
     final double? lat = coordinates['lat'] != null ? double.tryParse(coordinates['lat'].toString()) : null;
     final double? lng = coordinates['lng'] != null ? double.tryParse(coordinates['lng'].toString()) : null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -360,10 +410,12 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       ),
     );
   }
+
   Widget _buildCompletedPickupCard(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
     final rating = reservation['rating'];
     final hasRating = rating != null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -455,9 +507,11 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       ),
     );
   }
+
   void _markAsPickedUp(Map<String, dynamic> reservation) {
     final donation = reservation['donation'] ?? {};
     final foodDesc = donation['foodDescription'] ?? 'this donation';
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -514,9 +568,11 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
       ),
     );
   }
+
   void _showRatingDialog(Map<String, dynamic> reservation) {
     int selectedRating = 0;
     final feedbackController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(

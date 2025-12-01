@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 
 class ReceiverBrowseScreen extends StatefulWidget {
@@ -554,7 +555,22 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
                     const Icon(Icons.access_time, size: 16, color: Colors.grey),
                     const SizedBox(width: 4),
                     Text(
-                      'Pickup by: ${donation['pickupWindow']?['end'] ?? 'N/A'}',
+                      _formatPickupTime(donation['pickupWindow']?['end']),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.phone, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Contact: ${donation['donor']?['phone'] ?? 'N/A'}',
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 14,
@@ -597,14 +613,59 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
 
   void _showReserveDialog(dynamic donation) {
     final scaffoldContext = context; // Capture the screen's context
+    final donorPhone = donation['donor']?['phone'] ?? 'N/A';
+    final donorName = donation['donor']?['organizationName'] ?? donation['donor']?['name'] ?? 'Unknown';
     
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Confirm Reservation', style: TextStyle(fontFamily: 'Poppins')),
-        content: Text(
-          'Do you want to reserve ${donation['foodDescription']}?',
-          style: const TextStyle(fontFamily: 'Poppins'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Do you want to reserve ${donation['foodDescription']}?',
+              style: const TextStyle(fontFamily: 'Poppins'),
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 8),
+            Text(
+              'Donor Details:',
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.person, size: 16, color: Colors.grey),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    donorName,
+                    style: const TextStyle(fontFamily: 'Poppins', fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.phone, size: 16, color: Colors.grey),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    donorPhone,
+                    style: const TextStyle(fontFamily: 'Poppins', fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -676,6 +737,18 @@ class _ReceiverBrowseScreenState extends State<ReceiverBrowseScreen> {
         ],
       ),
     );
+  }
+
+  String _formatPickupTime(dynamic pickupTime) {
+    if (pickupTime == null) return 'Pickup by: N/A';
+    
+    try {
+      final dateTime = DateTime.parse(pickupTime.toString());
+      final formatter = DateFormat('MMM d, yyyy \'at\' h:mm a');
+      return 'Pickup by: ${formatter.format(dateTime)}';
+    } catch (e) {
+      return 'Pickup by: $pickupTime';
+    }
   }
 
   String _getFoodTypeLabel(String foodType) {

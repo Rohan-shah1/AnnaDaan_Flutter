@@ -333,26 +333,48 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
           ),
           trailing: const Icon(Icons.calendar_today),
           onTap: () async {
+            final now = DateTime.now();
             final dateTime = await showDatePicker(
               context: context,
-              initialDate: _pickupStartTime ?? DateTime.now(),
-              firstDate: DateTime.now(),
-              lastDate: DateTime.now().add(const Duration(days: 7)),
+              initialDate: _pickupStartTime ?? now,
+              firstDate: now.subtract(const Duration(seconds: 1)), // Allow today
+              lastDate: now.add(const Duration(days: 7)),
             );
             if (dateTime != null) {
               final time = await showTimePicker(
                 context: context,
-                initialTime: TimeOfDay.fromDateTime(_pickupStartTime ?? DateTime.now()),
+                initialTime: TimeOfDay.fromDateTime(_pickupStartTime ?? now),
+                builder: (BuildContext context, Widget? child) {
+                  return MediaQuery(
+                    data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                    child: child!,
+                  );
+                },
               );
               if (time != null) {
-                setState(() {
-                  _pickupStartTime = DateTime(
-                    dateTime.year,
-                    dateTime.month,
-                    dateTime.day,
-                    time.hour,
-                    time.minute,
+                final selectedDateTime = DateTime(
+                  dateTime.year,
+                  dateTime.month,
+                  dateTime.day,
+                  time.hour,
+                  time.minute,
+                );
+                
+                // Validate that the selected time hasn't passed
+                if (selectedDateTime.isBefore(now)) {
+                  final formattedDateTime = '${dateTime.day}/${dateTime.month}/${dateTime.year} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Selected time ($formattedDateTime) has already passed. Please select a future time.'),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 4),
+                    ),
                   );
+                  return;
+                }
+                
+                setState(() {
+                  _pickupStartTime = selectedDateTime;
                 });
               }
             }
@@ -369,26 +391,59 @@ class _PostDonationScreenState extends State<PostDonationScreen> {
           ),
           trailing: const Icon(Icons.calendar_today),
           onTap: () async {
+            final now = DateTime.now();
             final dateTime = await showDatePicker(
               context: context,
-              initialDate: _pickupEndTime ?? _pickupStartTime ?? DateTime.now(),
-              firstDate: _pickupStartTime ?? DateTime.now(),
-              lastDate: DateTime.now().add(const Duration(days: 7)),
+              initialDate: _pickupEndTime ?? _pickupStartTime ?? now,
+              firstDate: _pickupStartTime ?? now.subtract(const Duration(seconds: 1)), // Allow today
+              lastDate: now.add(const Duration(days: 7)),
             );
             if (dateTime != null) {
               final time = await showTimePicker(
                 context: context,
-                initialTime: TimeOfDay.fromDateTime(_pickupEndTime ?? DateTime.now()),
+                initialTime: TimeOfDay.fromDateTime(_pickupEndTime ?? now),
+                builder: (BuildContext context, Widget? child) {
+                  return MediaQuery(
+                    data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                    child: child!,
+                  );
+                },
               );
               if (time != null) {
-                setState(() {
-                  _pickupEndTime = DateTime(
-                    dateTime.year,
-                    dateTime.month,
-                    dateTime.day,
-                    time.hour,
-                    time.minute,
+                final selectedDateTime = DateTime(
+                  dateTime.year,
+                  dateTime.month,
+                  dateTime.day,
+                  time.hour,
+                  time.minute,
+                );
+                
+                // Validate that the selected time hasn't passed
+                if (selectedDateTime.isBefore(now)) {
+                  final formattedDateTime = '${dateTime.day}/${dateTime.month}/${dateTime.year} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Selected time ($formattedDateTime) has already passed. Please select a future time.'),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 4),
+                    ),
                   );
+                  return;
+                }
+                
+                // Validate that end time is after start time
+                if (_pickupStartTime != null && selectedDateTime.isBefore(_pickupStartTime!)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('End time must be after start time'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                
+                setState(() {
+                  _pickupEndTime = selectedDateTime;
                 });
               }
             }

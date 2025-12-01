@@ -88,28 +88,25 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // App Logo
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: 200,
+                  height: 200,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF42A5F5), Color(0xFF1976D2)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: Offset(0, 5),
+                        color: Colors.blue.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: Offset(0, 10),
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.restaurant,
-                    size: 60,
-                    color: Colors.white,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/images/Logo.jpg',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 SizedBox(height: 40),

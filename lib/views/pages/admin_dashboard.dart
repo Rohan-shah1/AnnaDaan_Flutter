@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -103,6 +104,27 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   }
 
   Future<void> _handleApprove(String userId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Approve Verification'),
+        content: const Text('Are you sure you want to approve this user\'s verification?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.green),
+            child: const Text('Approve'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
     final success = await ApiService().verifyUser(userId, 'verified');
     if (success) {
       if (mounted) {
@@ -121,6 +143,27 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
   }
 
   Future<void> _handleReject(String userId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reject Verification'),
+        content: const Text('Are you sure you want to reject this user\'s verification?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Reject'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
     final success = await ApiService().verifyUser(userId, 'rejected');
     if (success) {
       if (mounted) {
@@ -175,11 +218,82 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
     }
   }
 
+  Future<void> _handleViewDocument(String docId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('View Document'),
+        content: const Text('This will open the verification document in your browser. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Open in Browser'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final url = '${ApiService.baseUrl}/api/upload/$docId';
+      final uri = Uri.parse(url);
+      
+      // Directly launch the URL without checking canLaunchUrl
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error opening document: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Are you sure you want to logout?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
+              
+              if (confirm == true) {
+                await ApiService().logout();
+                if (mounted) {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              }
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -481,15 +595,32 @@ class _AdminDashboardState extends State<AdminDashboard> with SingleTickerProvid
               ],
             ),
           ),
-          _buildActionButtons(id),
+          _buildActionButtons(id, docInfo),
         ],
       ),
     );
   }
 
-  Widget _buildActionButtons(String userId) {
+  Widget _buildActionButtons(String userId, dynamic docInfo) {
+    // Extract document ID for URL
+    final docId = docInfo is Map ? docInfo['_id'] : docInfo;
+    
     return Row(
       children: [
+        // View Document button
+        if (docId != null)
+          InkWell(
+            onTap: () => _handleViewDocument(docId.toString()),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Icon(Icons.visibility, size: 18, color: Colors.blue),
+            ),
+          ),
+        if (docId != null) const SizedBox(width: 8),
         InkWell(
           onTap: () => _handleApprove(userId),
           child: Container(

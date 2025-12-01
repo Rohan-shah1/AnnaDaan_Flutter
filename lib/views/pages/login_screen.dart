@@ -347,12 +347,23 @@ class _LoginPageState extends State<LoginScreen> {
 
 
   Future<void> _navigateAfterLogin(ApiService apiService) async {
-    if (apiService.userProfile != null &&
-        apiService.userProfile!['profileCompleted'] == true) {
+    final userProfile = apiService.userProfile;
+    
+    if (userProfile == null) {
+      Navigator.pushReplacementNamed(context, '/role-selection');
+      return;
+    }
 
-      if (apiService.userProfile!['userType'] == 'donor') {
+    // Admin bypasses profile completion check
+    if (userProfile['userType'] == 'admin') {
+      Navigator.pushReplacementNamed(context, '/admin-dashboard');
+      return;
+    }
+
+    if (userProfile['profileCompleted'] == true) {
+      if (userProfile['userType'] == 'donor') {
         Navigator.pushReplacementNamed(context, '/donor-dashboard');
-      } else if (apiService.userProfile!['userType'] == 'receiver') {
+      } else if (userProfile['userType'] == 'receiver') {
         // Fetch location for receivers
         await _fetchAndSetLocation(apiService);
         Navigator.pushReplacementNamed(context, '/receiver-dashboard');
@@ -360,9 +371,8 @@ class _LoginPageState extends State<LoginScreen> {
         // userType is neither donor nor receiver
         Navigator.pushReplacementNamed(context, '/role-selection');
       }
-
     } else {
-      // profileCompleted == false OR userProfile == null
+      // profileCompleted == false
       Navigator.pushReplacementNamed(context, '/role-selection');
     }
   }

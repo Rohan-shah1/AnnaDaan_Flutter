@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
+import 'package:provider/provider.dart';
+import '../../services/api_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,23 +20,49 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateToLogin();
   }
 
-  void _navigateToLogin() {
-    _timer = Timer(Duration(seconds: 2), () {
-      if (mounted) {
-        try {
-          Navigator.pushReplacementNamed(context, '/login');
-        } catch (e) {
-          print('Navigation error: $e');
-          // Fallback: try to show a simple screen
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => _ErrorScreen()),
-            );
-          }
-        }
+  void _navigateToLogin() async {
+    // Wait for ApiService to initialize
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    
+    // Wait a bit for splash effect and initialization
+    await Future.delayed(Duration(seconds: 2));
+    
+    // Ensure ApiService is initialized
+    int retries = 0;
+    while (!apiService.isInitialized && retries < 5) {
+      await Future.delayed(Duration(milliseconds: 500));
+      retries++;
+    }
+
+    if (mounted) {
+      if (apiService.isLoggedIn && apiService.userProfile != null) {
+        _navigateBasedOnRole(apiService);
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
       }
-    });
+    }
+  }
+
+  void _navigateBasedOnRole(ApiService apiService) {
+    final userProfile = apiService.userProfile!;
+    
+    // Admin bypasses profile completion check
+    if (userProfile['userType'] == 'admin') {
+      Navigator.pushReplacementNamed(context, '/admin-dashboard');
+      return;
+    }
+
+    if (userProfile['profileCompleted'] == true) {
+      if (userProfile['userType'] == 'donor') {
+        Navigator.pushReplacementNamed(context, '/donor-dashboard');
+      } else if (userProfile['userType'] == 'receiver') {
+        Navigator.pushReplacementNamed(context, '/receiver-dashboard');
+      } else {
+        Navigator.pushReplacementNamed(context, '/role-selection');
+      }
+    } else {
+      Navigator.pushReplacementNamed(context, '/role-selection');
+    }
   }
 
   @override

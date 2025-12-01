@@ -918,6 +918,120 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  // ----------------- ADMIN -----------------
+
+  // Get Admin Dashboard Stats
+  Future<Map<String, dynamic>> getAdminStats() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/admin/stats'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['stats'] ?? {};
+      } else {
+        print('Failed to fetch admin stats: ${response.body}');
+        return {};
+      }
+    } catch (e) {
+      print('Error fetching admin stats: $e');
+      return {};
+    }
+  }
+
+  // Get Pending Verifications
+  Future<List<dynamic>> getPendingVerifications() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/admin/pending-verifications'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['users'] ?? [];
+      } else {
+        print('Failed to fetch pending verifications: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching pending verifications: $e');
+      return [];
+    }
+  }
+
+  // Verify User
+  Future<bool> verifyUser(String userId, String status) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/admin/verify/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+        body: json.encode({'status': status}),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error verifying user: $e');
+      return false;
+    }
+  }
+
+  // Get All Users
+  Future<Map<String, dynamic>> getAllUsers({int page = 1, int limit = 10, String? search, String? type}) async {
+    try {
+      String url = '$baseUrl/api/admin/users?page=$page&limit=$limit';
+      if (search != null && search.isNotEmpty) url += '&search=$search';
+      if (type != null && type.isNotEmpty) url += '&type=$type';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        print('Failed to fetch users: ${response.body}');
+        return {};
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+      return {};
+    }
+  }
+
+  // Delete User
+  Future<bool> deleteUser(String userId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/api/admin/users/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_token != null) 'Authorization': 'Bearer $_token',
+        },
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error deleting user: $e');
+      return false;
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();

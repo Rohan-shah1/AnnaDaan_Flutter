@@ -30,6 +30,7 @@ import 'package:annadaan/views/receiver_pages/receiver_browse_screen.dart';
 import 'package:annadaan/views/pages/otp_verification_screen.dart';
 import 'package:annadaan/views/pages/forgot_password_screen.dart';
 import 'package:annadaan/views/pages/reset_password_screen.dart';
+import 'package:annadaan/views/pages/admin_dashboard.dart';
 
 void main() {
   runZonedGuarded(() async {
@@ -103,6 +104,7 @@ class Annadaan extends StatelessWidget {
             otp: args['otp'],
           );
         },
+        '/admin-dashboard': (context) => const AdminDashboard(),
       },
       builder: (context, child) {
         return MediaQuery(

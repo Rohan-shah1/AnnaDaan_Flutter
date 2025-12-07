@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
+import '../pages/location_picker.dart';
 
 class ReceiverForm extends StatefulWidget {
   const ReceiverForm({super.key});
@@ -32,6 +33,13 @@ class _ReceiverFormState extends State<ReceiverForm> {
         _registrationNumberController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (_phoneController.text.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(_phoneController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Phone number must be exactly 10 digits')),
       );
       return;
     }
@@ -180,7 +188,7 @@ class _ReceiverFormState extends State<ReceiverForm> {
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: '+9779800000000',
+                  hintText: '9800000000',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
@@ -204,6 +212,23 @@ class _ReceiverFormState extends State<ReceiverForm> {
                   hintText: 'Kathmandu',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.map),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LocationPicker()),
+                      );
+
+                      if (result != null && result is Map) {
+                        setState(() {
+                          if (result['address'] != null) {
+                            _cityController.text = result['address'];
+                          }
+                        });
+                      }
+                    },
+                  ),
                 ),
               ),
               SizedBox(height: 50),

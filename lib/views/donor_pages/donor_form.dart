@@ -48,6 +48,13 @@ class _DonorFormState extends State<DonorForm> {
       return;
     }
 
+    if (_phoneController.text.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(_phoneController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Phone number must be exactly 10 digits')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -220,7 +227,7 @@ class _DonorFormState extends State<DonorForm> {
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: '+9779800000000',
+                  hintText: '9800000000',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),

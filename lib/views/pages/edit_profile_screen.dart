@@ -239,6 +239,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   prefixIcon: Icon(Icons.phone),
                 ),
                 keyboardType: TextInputType.phone,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Enter your phone number';
+                  if (v.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(v)) {
+                    return 'Phone number must be exactly 10 digits';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(

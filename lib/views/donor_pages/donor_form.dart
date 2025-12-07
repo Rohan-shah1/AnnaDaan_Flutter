@@ -220,7 +220,7 @@ class _DonorFormState extends State<DonorForm> {
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: '+918676543210',
+                  hintText: '+9779800000000',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
@@ -241,7 +241,7 @@ class _DonorFormState extends State<DonorForm> {
               TextField(
                 controller: _cityController,
                 decoration: InputDecoration(
-                  hintText: 'Mumbai',
+                  hintText: 'Kathmandu',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   suffixIcon: IconButton(

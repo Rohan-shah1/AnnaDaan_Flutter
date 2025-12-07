@@ -336,7 +336,11 @@ class _LoginPageState extends State<LoginScreen> {
         }
       }
     } catch (e) {
-      _showErrorDialog('Google Sign-In failed: $e');
+      String errorMessage = 'Google Sign-In failed';
+      if (e.toString().contains('network_error') || e.toString().contains('SocketException')) {
+        errorMessage = 'Network error, check the internet';
+      }
+      _showErrorDialog(errorMessage);
     } finally {
       setState(() {
         _isGoogleLoading = false;

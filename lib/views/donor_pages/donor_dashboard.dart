@@ -39,6 +39,7 @@ class _DonorDashboardState extends State<DonorDashboard> {
       }
     } catch (e) {
       print('Error fetching notifications: $e');
+      // Optional: Show error for notifications or keep it silent
     }
   }
 
@@ -70,6 +71,17 @@ class _DonorDashboardState extends State<DonorDashboard> {
         setState(() {
           _isLoading = false;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load dashboard: $e'),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: _fetchDashboardData,
+            ),
+          ),
+        );
       }
     }
   }

@@ -60,6 +60,15 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  // Helper for error handling
+  Map<String, dynamic> _handleError(dynamic e) {
+    print('❌ Error: $e');
+    if (e is SocketException || e.toString().contains('SocketException')) {
+      return {'success': false, 'message': 'Network error, check the internet'};
+    }
+    return {'success': false, 'message': 'Error: $e'};
+  }
+
   // Email registration
   Future<Map<String, dynamic>> register(String name, String email, String password) async {
     try {
@@ -92,7 +101,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Registration failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -117,7 +126,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Login failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -142,7 +151,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Google authentication failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -217,11 +226,7 @@ class ApiService with ChangeNotifier {
         };
       }
     } catch (e) {
-      print('❌ Error updating profile: $e');
-      return {
-        'success': false,
-        'message': 'Network error: $e'
-      };
+      return _handleError(e);
     }
   }
 
@@ -260,10 +265,7 @@ class ApiService with ChangeNotifier {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Network error: $e'
-      };
+      return _handleError(e);
     }
   }
 
@@ -335,7 +337,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Upload failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -362,7 +364,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Failed to post donation'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -521,7 +523,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Update failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -544,7 +546,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Delete failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -574,7 +576,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Reservation failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -652,7 +654,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Status update failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -685,7 +687,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Upload failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -713,7 +715,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Rating submission failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -781,7 +783,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Token registration failed'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -806,7 +808,7 @@ class ApiService with ChangeNotifier {
         return {'success': false, 'message': data['message'] ?? 'Failed to fetch impact metrics'};
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error: $e'};
+      return _handleError(e);
     }
   }
 
@@ -850,7 +852,7 @@ class ApiService with ChangeNotifier {
       
       return data;
     } catch (e) {
-      return {'success': false, 'message': e.toString()};
+      return _handleError(e);
     }
   }
 
@@ -865,7 +867,7 @@ class ApiService with ChangeNotifier {
 
       return json.decode(response.body);
     } catch (e) {
-      return {'success': false, 'message': e.toString()};
+      return _handleError(e);
     }
   }
 
@@ -880,7 +882,7 @@ class ApiService with ChangeNotifier {
 
       return json.decode(response.body);
     } catch (e) {
-      return {'success': false, 'message': e.toString()};
+      return _handleError(e);
     }
   }
 
@@ -895,7 +897,7 @@ class ApiService with ChangeNotifier {
 
       return json.decode(response.body);
     } catch (e) {
-      return {'success': false, 'message': e.toString()};
+      return _handleError(e);
     }
   }
 
@@ -914,7 +916,7 @@ class ApiService with ChangeNotifier {
 
       return json.decode(response.body);
     } catch (e) {
-      return {'success': false, 'message': e.toString()};
+      return _handleError(e);
     }
   }
 

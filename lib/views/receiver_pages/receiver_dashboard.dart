@@ -34,6 +34,7 @@ class _ReceiverDashboardState extends State<ReceiverDashboard> {
       }
     } catch (e) {
       print('Error fetching notifications: $e');
+      // Optional: Show error for notifications or keep it silent to not annoy user
     }
   }
 
@@ -154,6 +155,17 @@ class __ReceiverReservedScreenState extends State<_ReceiverReservedScreen> {
         setState(() {
           _isLoading = false;
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load reservations: $e'),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: _fetchReservations,
+            ),
+          ),
+        );
       }
     }
   }

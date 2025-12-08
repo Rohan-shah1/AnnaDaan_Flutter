@@ -33,7 +33,7 @@ class ApiService with ChangeNotifier {
   void setCurrentLocation(double lat, double lng) {
     _currentLocation = {'lat': lat, 'lng': lng};
     notifyListeners();
-    print('📍 Location updated in ApiService: $_currentLocation');
+    print('Location updated in ApiService: $_currentLocation');
   }
 
   Future<void> initialize() async {
@@ -52,9 +52,9 @@ class ApiService with ChangeNotifier {
       _isInitialized = true;
       notifyListeners();
 
-      print('🔵 ApiService initialized - loggedIn: $_isLoggedIn');
+      print('ApiService initialized - loggedIn: $_isLoggedIn');
     } catch (e) {
-      print('❌ Error initializing ApiService: $e');
+      print('Error initializing ApiService: $e');
       _isInitialized = true;
       notifyListeners();
     }
@@ -62,7 +62,7 @@ class ApiService with ChangeNotifier {
 
   // Helper for error handling
   Map<String, dynamic> _handleError(dynamic e) {
-    print('❌ Error: $e');
+    print('Error: $e');
     if (e is SocketException || e.toString().contains('SocketException')) {
       return {'success': false, 'message': 'Network error, check the internet'};
     }
@@ -166,7 +166,7 @@ class ApiService with ChangeNotifier {
     await prefs.setString('auth_token', _token!);
 
     notifyListeners();
-    print('✅ Authentication successful - token saved');
+    print('Authentication successful - token saved');
   }
 
   // Get user profile
@@ -186,11 +186,11 @@ class ApiService with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('❌ Error getting user profile: $e');
+      print('Error getting user profile: $e');
     }
   }
 
-  // ⭐ FIXED: Update Profile for EDITING (uses PATCH, no userType required)
+  // FIXED: Update Profile for EDITING (uses PATCH, no userType required)
   Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> profileData) async {
     try {
       // Use PATCH method for editing existing profiles
@@ -287,7 +287,7 @@ class ApiService with ChangeNotifier {
     _isLoggedIn = false;
 
     notifyListeners();
-    print('✅ Logged out successfully');
+    print('Logged out successfully');
   }
 
   // File Upload
